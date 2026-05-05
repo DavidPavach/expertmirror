@@ -7,7 +7,7 @@
 		"moduleResolution": "NodeNext",
 
 		"outDir": "dist",
-		"rootDir": "src",
+		"rootDir": "./src",
 
 		"strict": true,
 		"skipLibCheck": true,

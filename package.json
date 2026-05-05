@@ -1,32 +1,36 @@
 {
-  "name": "expert_mirror_be",
-  "module": "index.ts",
-  "scripts": {
-    "format": "biome format",
-    "lint": "biome lint",
-    "check": "biome check"
-  },
-  "dependencies": {
-    "@fastify/cookie": "^11.0.2",
-    "@fastify/cors": "^11.2.0",
-    "@fastify/swagger": "^9.7.0",
-    "@fastify/swagger-ui": "^5.2.6",
-    "bcrypt": "^6.0.0",
-    "dotenv": "^17.4.2",
-    "fastify": "^5.8.5",
-    "fastify-plugin": "^5.1.0",
-    "fastify-type-provider-zod": "^6.1.0",
-    "mongoose": "^9.6.1",
-    "nanoid": "^5.1.11",
-    "socket.io": "^4.8.3",
-    "zod": "^4.4.3"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.4.14",
-    "@types/bun": "latest",
-    "@types/node": "^25.6.0",
-    "typescript": "^6.0.3"
-  },
-  "private": true,
-  "type": "module"
+	"name": "expert_mirror_be",
+	"module": "index.ts",
+	"scripts": {
+		"build": "tsc",
+		"start": "node dist/server.js",
+		"dev": "bun run --watch src/server.ts",
+		"format": "biome format",
+		"lint": "biome lint",
+		"check": "biome check"
+	},
+	"dependencies": {
+		"@fastify/cookie": "^11.0.2",
+		"@fastify/cors": "^11.2.0",
+		"@fastify/swagger": "^9.7.0",
+		"@fastify/swagger-ui": "^5.2.6",
+		"bcrypt": "^6.0.0",
+		"dotenv": "^17.4.2",
+		"fastify": "^5.8.5",
+		"fastify-plugin": "^5.1.0",
+		"fastify-type-provider-zod": "^6.1.0",
+		"mongoose": "^9.6.1",
+		"nanoid": "^5.1.11",
+		"socket.io": "^4.8.3",
+		"zod": "^4.4.3"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.14",
+		"@types/bcrypt": "^6.0.0",
+		"@types/bun": "latest",
+		"@types/node": "^25.6.0",
+		"typescript": "^6.0.3"
+	},
+	"private": true,
+	"type": "module"
 }
