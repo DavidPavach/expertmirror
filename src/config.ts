@@ -13,9 +13,7 @@ const envSchema = z.object({
 	FROM_EMAIL: z.string(),
 	REPLY_EMAIL: z.string(),
 	RESEND_API: z.string(),
-
-	ENCRYPTION_KEY: z.string(),
-	ENCRYPTION_IV: z.string(),
+	ADMIN_EMAIL: z.email(),
 
 	AWS_BUCKET_REGION: z.string(),
 	AWS_BUCKET_NAME: z.string(),
@@ -35,8 +33,7 @@ export const {
 	FROM_EMAIL,
 	REPLY_EMAIL,
 	RESEND_API,
-	ENCRYPTION_KEY,
-	ENCRYPTION_IV,
+	ADMIN_EMAIL,
 	AWS_BUCKET_REGION,
 	AWS_BUCKET_NAME,
 	AWS_ACCESS_KEY,
