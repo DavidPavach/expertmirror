@@ -79,6 +79,11 @@ export const buildApp = async (): Promise<FastifyInstance> => {
 
 	// Socket
 
+	// Health Check Endpoint
+	app.get("/health", async () => {
+		return { status: "OK" };
+	});
+
 	// Global error handler
 	app.setErrorHandler(
 		(error: FastifyError & { statusCode?: number }, request, reply) => {
