@@ -17,6 +17,11 @@ export const createUserSchema = z.object({
 	password: z
 		.string()
 		.min(6, { error: "Password must be at least 6 characters long" }),
+	referral: z
+		.string()
+		.min(3, { error: "Username cannot be less than 3 Chars" })
+		.max(40, { error: "Username cannot be more than 40 Chars" })
+		.optional(),
 });
 
 // User Update Schema

@@ -3,6 +3,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { sendResponse } from "../../utils/response.utils.js";
 import { deleteSession } from "../auth/service.js";
 import type { IdInput, PaginationInput } from "../general/schema.js";
+import { createReferral } from "../referral/service.js";
 import type {
 	AdminSuspendInput,
 	AdminUpdateUserInput,
@@ -16,10 +17,21 @@ export const RegisterUserHandler = async (
 	request: FastifyRequest<{ Body: CreateUserInput }>,
 	reply: FastifyReply,
 ) => {
-	const body = await request.body;
+	const { referral, ...body } = request.body;
 
-	// Create user and return
-	await UserService.createUser(body);
+	// Create user, create referral if exists and return
+	const newUser = await UserService.createUser(body);
+
+	// Create Referral Document if Referral Exists
+	if (referral && referral.length > 3) {
+		const user = await UserService.getUser(referral);
+		if (!user)
+			return sendResponse(reply, 404, false, "Referrer User Not Found");
+
+		// Create New Referral Document
+		await createReferral(user._id.toString(), newUser._id.toString());
+	}
+
 	sendResponse(reply, 201, true, "User registered successfully");
 };
 
@@ -28,7 +40,7 @@ export const UpdateUserHandler = async (
 	request: FastifyRequest<{ Body: UpdateUserInput }>,
 	reply: FastifyReply,
 ) => {
-	const userId = "";
+	const userId = request.user.id;
 	const body = request.body;
 
 	// Update user and return
