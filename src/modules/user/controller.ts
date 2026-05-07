@@ -1,5 +1,7 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-
+import generalTemplate from "../../emails/admin/general.js";
+import welcome from "../../emails/user/welcome.js";
+import { sendAdminEmail, sendEmail } from "../../libs/mailer.js";
 import { sendResponse } from "../../utils/response.utils.js";
 import { deleteSession } from "../auth/service.js";
 import type { IdInput, PaginationInput } from "../general/schema.js";
@@ -18,21 +20,54 @@ export const RegisterUserHandler = async (
 	reply: FastifyReply,
 ) => {
 	const { referral, ...body } = request.body;
+	let referrerUser = null;
 
-	// Create user, create referral if exists and return
-	const newUser = await UserService.createUser(body);
-
-	// Create Referral Document if Referral Exists
+	// Validate the referral code.
 	if (referral && referral.length > 3) {
-		const user = await UserService.getUser(referral);
-		if (!user)
-			return sendResponse(reply, 404, false, "Referrer User Not Found");
+		referrerUser = await UserService.getUser(referral);
 
-		// Create New Referral Document
-		await createReferral(user._id.toString(), newUser._id.toString());
+		if (!referrerUser) {
+			// If the referral code is bad, stop the registration process
+			return sendResponse(
+				reply,
+				400,
+				false,
+				"Invalid referral code. Referrer not found.",
+			);
+		}
 	}
 
-	sendResponse(reply, 201, true, "User registered successfully");
+	// Create the User
+	const newUser = await UserService.createUser(body);
+
+	// Create Referral Document (if a valid referral was provided)
+	if (referrerUser) {
+		await createReferral(referrerUser._id.toString(), newUser._id.toString());
+	}
+
+	// Generate Email Templates
+	const template = generalTemplate({
+		action: "A New User Just Created An Account",
+		message: `The user with the email ${newUser.email} and username ${newUser.username} just created a new account. Kindly login and continue.`,
+		name: newUser.username,
+		email: newUser.email,
+		accountId: newUser.accountId,
+	});
+
+	const welcomeEmailContent = welcome({ name: newUser.username });
+
+	// Send Emails Concurrently
+	await Promise.allSettled([
+		sendAdminEmail(template.html),
+		sendEmail({
+			to: newUser.email,
+			subject: "Welcome to ExpertMirrorCon",
+			html: welcomeEmailContent.html,
+		}),
+	]);
+
+	// Send Success Response
+	return sendResponse(reply, 201, true, "User registered successfully");
 };
 
 // Update User Details
