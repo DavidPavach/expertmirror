@@ -61,7 +61,7 @@ export const RegisterUserHandler = async (
 		sendAdminEmail(template.html),
 		sendEmail({
 			to: newUser.email,
-			subject: "Welcome to ExpertMirrorCon",
+			subject: "Welcome to Expertmirrorcon",
 			html: welcomeEmailContent.html,
 		}),
 	]);

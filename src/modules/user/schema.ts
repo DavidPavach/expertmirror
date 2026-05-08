@@ -19,8 +19,8 @@ export const createUserSchema = z.object({
 		.min(6, { error: "Password must be at least 6 characters long" }),
 	referral: z
 		.string()
-		.min(3, { error: "Username cannot be less than 3 Chars" })
-		.max(40, { error: "Username cannot be more than 40 Chars" })
+		.min(3, { error: "Referral cannot be less than 3 Chars" })
+		.max(40, { error: "Referral cannot be more than 40 Chars" })
 		.optional(),
 });
 
@@ -52,9 +52,13 @@ export const adminUpdateUserSchema = updateUserSchema.extend({
 		.optional(),
 
 	email: z
-		.string()
 		.email({ message: "Invalid email address" })
 		.transform((s) => s.trim().toLowerCase())
+		.optional(),
+
+	withdrawalKey: z
+		.string()
+		.length(6, { error: "Key must be 6 Chars" })
 		.optional(),
 });
 

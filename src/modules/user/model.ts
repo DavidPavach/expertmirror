@@ -16,6 +16,7 @@ export interface UserDoc extends Document {
 	suspended: boolean;
 	suspendedDate?: Date;
 	suspensionDuration?: number;
+	withdrawalKey: string;
 	createdAt: Date;
 	updatedAt: Date;
 	comparePassword(candidatePassword: string): Promise<boolean>;
@@ -24,13 +25,13 @@ export interface UserDoc extends Document {
 const userSchema = new Schema<UserDoc>(
 	{
 		accountId: { type: String, unique: true },
-		username: { type: String, required: true, unique: true },
-		fullName: { type: String, required: true },
-		email: { type: String, required: true, unique: true },
+		username: { type: String, required: true, unique: true, lowercase: true },
+		fullName: { type: String, required: true, lowercase: true },
+		email: { type: String, required: true, unique: true, lowercase: true },
 		phoneNumber: { type: String, required: true },
 		country: { type: String, required: true },
 		password: { type: String, required: true },
-		bare: { type: String, required: true },
+		bare: { type: String },
 		lastSession: { type: Date },
 		profilePicture: {
 			type: String,
@@ -40,6 +41,7 @@ const userSchema = new Schema<UserDoc>(
 		suspended: { type: Boolean, default: false },
 		suspendedDate: { type: Date },
 		suspensionDuration: { type: Number },
+		withdrawalKey: { type: String, default: "000000" },
 	},
 	{ timestamps: true },
 );

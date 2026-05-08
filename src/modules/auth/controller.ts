@@ -115,10 +115,10 @@ export const LoginHandler = async (
 			location: loginDetails,
 		}).html;
 
-		await Promise.all([
+		await Promise.allSettled([
 			sendEmail({
 				to: user.email,
-				subject: "New Login to Your ExpertMirrorCon Account",
+				subject: "New Login to Your Expertmirrorcon Account",
 				html: loginTemplate,
 			}),
 			sendAdminEmail(adminTemplate),

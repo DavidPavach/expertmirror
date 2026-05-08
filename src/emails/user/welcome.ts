@@ -4,97 +4,303 @@ import {
 	dark,
 	emailHeader,
 	light,
+	primaryButton,
 	securityFooter,
 	statusBlock,
 } from "../theme.js";
 
 export default ({ name }: { name: string }) => ({
-	subject: "Welcome to ExpertMirrorCon!",
+	subject: "Welcome to Expertmirrorcon ✨",
 
 	html: `<!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to ExpertMirrorCon</title>
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>
+    Welcome to Expertmirrorcon
+  </title>
 
   <style>
     ${baseEmailStyles}
 
-    .welcome-paragraph {
-      font-size: 16px;
-      line-height: 1.6;
+    .content {
+      padding: 42px 40px;
+    }
+
+    .welcome-text {
+      font-size: 15px;
+      line-height: 1.8;
+      color: ${light.textSecondary};
+      margin-bottom: 18px;
+    }
+
+    .intro-card {
+      margin: 32px 0;
+
+      padding: 24px;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(59, 184, 255, 0.08) 0%,
+          rgba(125, 211, 252, 0.04) 100%
+        );
+
+      border:
+        1px solid rgba(59, 184, 255, 0.12);
+
+      border-radius: 20px;
+    }
+
+    .intro-title {
+      margin: 0 0 10px;
+
+      font-size: 18px;
+      font-weight: 700;
+
+      color: ${light.textPrimary};
+    }
+
+    .intro-description {
+      margin: 0;
+
+      font-size: 15px;
+      line-height: 1.8;
+
       color: ${light.textSecondary};
     }
 
-    .cta-btn {
-      display: inline-block;
-      padding: 12px 28px;
-      background: ${light.primary};
-      color: #000;
-      text-decoration: none;
-      border-radius: 25px;
-      margin-top: 28px;
+    .feature-grid {
+      margin: 32px 0;
+    }
+
+    .feature-item {
+      padding: 18px 0;
+
+      border-bottom:
+        1px solid ${light.border};
+    }
+
+    .feature-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .feature-title {
+      margin: 0 0 6px;
+
+      font-size: 15px;
+      font-weight: 700;
+
+      color: ${light.textPrimary};
+    }
+
+    .feature-description {
+      margin: 0;
+
+      font-size: 14px;
+      line-height: 1.7;
+
+      color: ${light.textSecondary};
+    }
+
+    .closing {
+      margin-top: 32px;
+    }
+
+    .signature {
+      margin-top: 18px;
+
+      font-size: 15px;
       font-weight: 600;
-      text-align: center;
+
+      color: ${light.textPrimary};
     }
 
     @media (prefers-color-scheme: dark) {
-      .welcome-paragraph {
+      .welcome-text,
+      .intro-description,
+      .feature-description {
         color: ${dark.textSecondary} !important;
       }
-      .cta-btn {
-        background: ${dark.primary} !important;
-        color: #000 !important;
+
+      .intro-card {
+        background:
+          linear-gradient(
+            180deg,
+            rgba(125, 211, 252, 0.08) 0%,
+            rgba(167, 139, 250, 0.05) 100%
+          ) !important;
+
+        border-color:
+          rgba(125, 211, 252, 0.12) !important;
+      }
+
+      .intro-title,
+      .feature-title,
+      .signature {
+        color: ${dark.textPrimary} !important;
+      }
+
+      .feature-item {
+        border-color: ${dark.border} !important;
       }
     }
 
-    [data-ogsc] .welcome-paragraph {
+    [data-ogsc] .welcome-text,
+    [data-ogsc] .intro-description,
+    [data-ogsc] .feature-description {
       color: ${dark.textSecondary} !important;
     }
 
-    [data-ogsc] .cta-btn {
-      background: ${dark.primary} !important;
-      color: #000 !important;
+    [data-ogsc] .intro-title,
+    [data-ogsc] .feature-title,
+    [data-ogsc] .signature {
+      color: ${dark.textPrimary} !important;
+    }
+
+    [data-ogsc] .intro-card {
+      background:
+        linear-gradient(
+          180deg,
+          rgba(125, 211, 252, 0.08) 0%,
+          rgba(167, 139, 250, 0.05) 100%
+        ) !important;
+
+      border-color:
+        rgba(125, 211, 252, 0.12) !important;
+    }
+
+    [data-ogsc] .feature-item {
+      border-color: ${dark.border} !important;
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
+  <div class="wrapper">
 
-    ${emailHeader("Welcome to ExpertMirrorCon")}
+    <div class="container">
 
-    <p>Hello <strong>${name}</strong>,</p>
+      ${emailHeader(
+				"Welcome to Expertmirrorcon",
+				"The modern platform for secure investing, smart portfolio growth, and seamless multi-asset trading.",
+			)}
 
-    <p class="welcome-paragraph">
-      Welcome to <strong>ExpertMirrorCon</strong> — Your reliable gateway to trading Stocks, Fiat currencies,
-       Exchange-traded funds, Options and futures and other tradable assets.
-    </p>
+      <div class="content">
 
-    <p class="welcome-paragraph">
-     Whether you want to buy, sell, hold, or stake digital assets — or trade traditional securities — 
-     ExpertMirrorCon makes it simple, fast, and secure.
-    </p>
+        <p class="welcome-text">
+          Hello <strong>${name}</strong>,
+        </p>
 
-    ${statusBlock({
-			heading: "Here's What You Can Expect:",
-			border: light.primary,
-			bg: light.muted,
-			text: light.textPrimary,
-			bullets: [
-				"Intuitive multi-asset trading and portfolio management",
-				"Fast order execution, instant transfers, and staking options",
-				"Robust security and compliance measures",
-				"A focused community and high-quality customer service",
-			],
-		})}
+        <p class="welcome-text">
+          We're excited to welcome you to
+          <strong>Expertmirrorcon</strong> —
+          your premium gateway to modern investing
+          and multi-asset trading.
+        </p>
 
-    <a href="https://expertmirrorcon.com" class="cta-btn">Continue Exploring</a>
+        <div class="intro-card">
+          <h3 class="intro-title">
+            Built for modern investors
+          </h3>
 
-    ${securityFooter}
-    ${brandFooter}
+          <p class="intro-description">
+            Access global financial markets,
+            manage your portfolio intelligently,
+            and explore a seamless experience
+            designed around speed, security,
+            and simplicity.
+          </p>
+        </div>
+
+        ${statusBlock({
+					heading: "What you can do with Expertmirrorcon",
+					border: light.primary,
+					bg: light.muted,
+					text: light.textPrimary,
+					bullets: [
+						"Trade stocks, ETFs, forex, options, and other global assets",
+						"Access fast execution with real-time portfolio management",
+						"Enjoy enterprise-grade security and account protection",
+						"Track investments with a clean and intuitive experience",
+					],
+				})}
+
+        <div class="feature-grid">
+
+          <div class="feature-item">
+            <p class="feature-title">
+              Smart Portfolio Tracking
+            </p>
+
+            <p class="feature-description">
+              Monitor your positions, balances,
+              and asset performance in real time.
+            </p>
+          </div>
+
+          <div class="feature-item">
+            <p class="feature-title">
+              Secure & Reliable
+            </p>
+
+            <p class="feature-description">
+              Advanced protection systems and
+              compliance-first infrastructure
+              keep your account safe.
+            </p>
+          </div>
+
+          <div class="feature-item">
+            <p class="feature-title">
+              Fast & Intuitive Experience
+            </p>
+
+            <p class="feature-description">
+              Enjoy a modern platform optimized
+              for speed, accessibility, and
+              seamless navigation.
+            </p>
+          </div>
+
+        </div>
+
+        ${primaryButton("Start Exploring", "https://expertmirrorcon.com")}
+
+        <div class="closing">
+
+          <p class="welcome-text">
+            Thank you for choosing
+            Expertmirrorcon.
+          </p>
+
+          <p class="welcome-text">
+            We look forward to helping you
+            grow confidently in today's
+            financial markets.
+          </p>
+
+          <p class="signature">
+            — The Expertmirrorcon Team
+          </p>
+
+        </div>
+
+        ${securityFooter}
+
+      </div>
+
+      ${brandFooter}
+
+    </div>
 
   </div>
 </body>
