@@ -33,7 +33,6 @@ export const generatePresignedUrls = async (
 			Bucket: bucketName,
 			Key: objectKey,
 			ContentType: item.contentType,
-			ChecksumSHA256: item.checksum,
 		});
 
 		// Generate the presigned URL valid for 3 minutes (180 seconds)

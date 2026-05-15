@@ -5,6 +5,7 @@ import login from "../../emails/user/login.js";
 import { sendAdminEmail, sendEmail } from "../../libs/mailer.js";
 import { formatWithTimezone } from "../../utils/format.js";
 import { sendResponse } from "../../utils/response.utils.js";
+import { getAdminByEmail } from "../admin/service.js";
 import * as UserService from "../user/service.js";
 import type { LoginInput } from "./schema.js";
 import * as AuthService from "./service.js";
@@ -75,7 +76,7 @@ export const LoginHandler = async (
 
 		// Create Auth
 		const result = await AuthService.loginUser(
-			"userId",
+			user._id.toString(),
 			{ device: body.device, rememberMe: body.rememberMe },
 			ipAddress,
 			"User",
@@ -146,4 +147,36 @@ export const LogoutHandler = async (
 
 	// Return a response
 	return sendResponse(reply, 200, true, "Logged out successfully");
+};
+
+// Admin
+
+// Auth an Admin
+export const AuthAdminHandler = async (
+	request: FastifyRequest<{ Body: LoginInput }>,
+	reply: FastifyReply,
+) => {
+	const body = request.body;
+	const ipAddress = request.ip;
+
+	// Fetch Admin Details
+	const admin = await getAdminByEmail(body.identifier);
+	if (!admin)
+		return sendResponse(reply, 404, false, "Incorrect Username or Password");
+
+	// Compare password
+	const isCorrect = await admin.comparePassword(body.password);
+	if (isCorrect) {
+		// Create Auth
+		await AuthService.loginUser(
+			admin._id.toString(),
+			{ device: body.device, rememberMe: body.rememberMe },
+			ipAddress,
+			"Admin",
+		);
+
+		return sendResponse(reply, 200, true, "Login Successful");
+	} else {
+		return sendResponse(reply, 400, false, "Incorrect Email or Password");
+	}
 };

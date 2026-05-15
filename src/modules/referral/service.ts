@@ -46,7 +46,7 @@ export const updateReferralStatus = async (
 	const updatedReferral = await ReferralModel.findByIdAndUpdate(
 		referralId,
 		{ rewardAmount },
-		{ new: true, runValidators: true },
+		{ returnDocument: "after", runValidators: true },
 	);
 
 	if (!updatedReferral) throw new Error("Referral not found");

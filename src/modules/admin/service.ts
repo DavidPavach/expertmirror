@@ -25,7 +25,7 @@ export const getAdminById = async (adminId: string) => {
 
 // READ: Fetches an admin profile by email
 export const getAdminByEmail = async (email: string) => {
-	return await AdminModel.findOne({ email }).select("-password");
+	return await AdminModel.findOne({ email });
 };
 
 // READ: Fetch all admin
@@ -56,7 +56,7 @@ export const updateAdmin = async (
 	}
 
 	const updatedAdmin = await AdminModel.findByIdAndUpdate(adminId, updateData, {
-		new: true,
+		returnDocument: "after",
 		runValidators: true,
 	}).select("-password");
 

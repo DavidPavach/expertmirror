@@ -51,7 +51,7 @@ export const updateKycById = async (
 	updateData: UpdateKycInput,
 ) => {
 	const updatedKyc = await KycModel.findByIdAndUpdate(kycId, updateData, {
-		new: true,
+		returnDocument: "after",
 		runValidators: true,
 	}).populate("userId", "-password");
 

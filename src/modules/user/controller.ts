@@ -5,6 +5,7 @@ import { sendAdminEmail, sendEmail } from "../../libs/mailer.js";
 import { sendResponse } from "../../utils/response.utils.js";
 import { deleteSession } from "../auth/service.js";
 import type { IdInput, PaginationInput } from "../general/schema.js";
+import { getKyc } from "../kyc/service.js";
 import { createReferral } from "../referral/service.js";
 import type {
 	AdminSuspendInput,
@@ -91,8 +92,9 @@ export const CurrentUserHandler = async (
 ) => {
 	const userId = request.user.id;
 
-	// Fetch User and Return
+	// Fetch User, KYC and Return
 	const user = await UserService.getUserById(userId);
+	const kyc = await getKyc(userId);
 
 	if (!user) {
 		return sendResponse(reply, 404, false, "User not found");
@@ -103,7 +105,7 @@ export const CurrentUserHandler = async (
 		200,
 		true,
 		"User Details was fetched successfully",
-		user,
+		{ ...user, kycStatus: !kyc ? "NOT STARTED" : kyc.status },
 	);
 };
 

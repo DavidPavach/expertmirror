@@ -38,7 +38,7 @@ export const loginUser = async (
 
 // READ: Validates a JTI from the cookie to ensure the session is active.
 export const validateSession = async (jti: string) => {
-	const session = await AuthModel.findOne({ jti }).populate("user");
+	const session = await AuthModel.findOne({ jti });
 
 	if (!session) return null;
 

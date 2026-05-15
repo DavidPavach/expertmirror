@@ -1,4 +1,4 @@
-import { baseEmailStyles, brandFooter, securityFooter } from "../theme.js";
+import { baseEmailStyles, brandFooter } from "../theme.js";
 
 const formatLabel = (key: string) =>
 	key
@@ -54,7 +54,6 @@ export default function generalTemplate(
     
                     ${renderDetailsTable(details)}
 
-                    ${securityFooter}
                     ${brandFooter}
 
                     </div>

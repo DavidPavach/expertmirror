@@ -25,6 +25,9 @@ export const setupSwagger = async (app: FastifyInstance) => {
 				{ name: "Admins", description: "Admin related endpoints" },
 				{ name: "KYCs", description: "KYC related endpoints" },
 				{ name: "Referrals", description: "Referral related endpoints" },
+				{ name: "Transactions", description: "Transaction related endpoints" },
+				{ name: "Settings", description: "Settings related endpoints" },
+				{ name: "Traders", description: "Traders related endpoints" },
 			],
 			components: {
 				securitySchemes: {

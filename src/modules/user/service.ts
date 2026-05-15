@@ -30,7 +30,7 @@ export const createUser = async (input: CreateUserInput) => {
 
 // READ: Fetches a user by their ID
 export const getUserById = async (userId: string) => {
-	return await UserModel.findById(userId).select("-password");
+	return await UserModel.findById(userId).select("-password").lean();
 };
 
 // READ: Fetch a user using either email or username
@@ -46,13 +46,21 @@ export const updateUser = async (
 	userId: string,
 	updateData: UpdateUserInput,
 ) => {
-	const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, {
-		new: true,
+	const { password, ...rest } = updateData;
+
+	const updatedUser = await UserModel.findByIdAndUpdate(userId, rest, {
+		returnDocument: "after",
 		runValidators: true,
 	}).select("-password");
 
 	if (!updatedUser) {
 		throw new AppError("User not found", { statusCode: 404 });
+	}
+
+	// Save Password
+	if (password?.trim()) {
+		updatedUser.password = password;
+		await updatedUser.save();
 	}
 
 	return updatedUser;
@@ -64,7 +72,7 @@ export const updateLastSession = async (userId: string) => {
 		userId,
 		{ lastSession: new Date() },
 		{
-			new: true,
+			returnDocument: "after",
 			runValidators: true,
 		},
 	).select("-password");
@@ -87,7 +95,7 @@ export const suspendUser = async (userId: string, durationInDays: number) => {
 			suspendedDate: new Date(),
 			suspensionDuration: durationInDays,
 		},
-		{ new: true },
+		{ returnDocument: "after" },
 	).select("-password");
 
 	if (!user) throw new AppError("User not found", { statusCode: 404 });
@@ -117,7 +125,7 @@ export const adminUpdateUser = async (
 	}
 
 	const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, {
-		new: true,
+		returnDocument: "after",
 		runValidators: true,
 	}).select("-password");
 

@@ -18,7 +18,7 @@ const adminSchema = new Schema<AdminDoc>(
 		adminId: { type: String, unique: true },
 		email: { type: String, required: true, unique: true },
 		password: { type: String, required: true },
-		bare: { type: String, required: true },
+		bare: { type: String },
 		role: {
 			type: String,
 			enum: ["SUPER_ADMIN", "ADMIN"],

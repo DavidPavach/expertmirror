@@ -19,6 +19,8 @@ const envSchema = z.object({
 	AWS_BUCKET_NAME: z.string(),
 	AWS_ACCESS_KEY: z.string(),
 	AWS_SECRET_ACCESS_KEY: z.string(),
+
+	COINGECKO_API_KEY: z.string(),
 });
 
 // Validate the environment variables
@@ -38,4 +40,5 @@ export const {
 	AWS_BUCKET_NAME,
 	AWS_ACCESS_KEY,
 	AWS_SECRET_ACCESS_KEY,
+	COINGECKO_API_KEY,
 } = parsedEnv;

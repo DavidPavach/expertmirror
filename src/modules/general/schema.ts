@@ -29,7 +29,6 @@ export const paginationSchema = z.object({
 export const presignItemSchema = z.object({
 	contentType: z.string().min(1, { error: "Content type is required" }),
 	fileSize: z.number().positive({ error: "File size must be positive" }),
-	checksum: z.string().min(1, { error: "SHA256 checksum is required" }),
 	fileName: z.string().min(1, { error: "File name is required" }),
 });
 

@@ -40,6 +40,7 @@ export const updateUserSchema = z.object({
 		.string()
 		.min(6, { error: "Password must be at least 6 characters long" })
 		.optional(),
+	profilePicture: z.url({ error: "Profile Picture must be a link"}).optional()
 });
 
 // Admin Update User Schema

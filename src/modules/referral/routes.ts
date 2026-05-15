@@ -10,7 +10,7 @@ export default async function referralRoutes(app: FastifyInstance) {
 	const appWithZod = app.withTypeProvider<ZodTypeProvider>();
 
 	// Get Users Referral
-	appWithZod.post<{ Querystring: PaginationInput }>(
+	appWithZod.get<{ Querystring: PaginationInput }>(
 		"/fetch",
 		{
 			preHandler: [app.authenticate, isUser],
@@ -24,7 +24,7 @@ export default async function referralRoutes(app: FastifyInstance) {
 	);
 
 	// Admin
-	appWithZod.post<{ Querystring: PaginationInput }>(
+	appWithZod.get<{ Querystring: PaginationInput }>(
 		"/fetch/all",
 		{
 			preHandler: [app.authenticate, isAdmin],

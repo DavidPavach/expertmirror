@@ -91,6 +91,7 @@ export const baseEmailStyles = `
 
     border: 1px solid ${light.border};
     border-radius: 24px;
+    padding: 20px;
 
     overflow: hidden;
 
@@ -235,7 +236,7 @@ export const baseEmailStyles = `
   }
 
   .security {
-    margin-top: 32px;
+    margin: 32px 0px;
 
     padding: 22px;
 
@@ -432,17 +433,8 @@ export const statusBlock = (opts: {
 	heading: string;
 	bullets: string[];
 }) => `
-  <div
-    class="status"
-    style="
-      border-left: 4px solid ${opts.border};
-      background: ${opts.bg};
-    "
-  >
-    <p
-      class="status-heading"
-      style="color:${opts.text};"
-    >
+  <div class="status"  style=" border-left: 4px solid ${opts.border}; background: ${opts.bg}">
+    <p class="status-heading" style="color:${opts.text};">
       ${opts.heading}
     </p>
 
@@ -451,8 +443,7 @@ export const statusBlock = (opts: {
 				(b) => `
         <p class="status-text">
           ${b}
-        </p>
-      `,
+        </p> `,
 			)
 			.join("")}
   </div>

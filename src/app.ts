@@ -16,6 +16,9 @@ import authRoutes from "./modules/auth/route.js";
 import generalRoutes from "./modules/general/route.js";
 import kycRoutes from "./modules/kyc/route.js";
 import referralRoutes from "./modules/referral/routes.js";
+import settingsRoutes from "./modules/settings/route.js";
+import traderRoutes from "./modules/trader/route.js";
+import transactionRoutes from "./modules/transaction/route.js";
 import userRoutes from "./modules/user/route.js";
 
 // Utils
@@ -76,6 +79,9 @@ export const buildApp = async (): Promise<FastifyInstance> => {
 	app.register(generalRoutes, { prefix: "/v1/api/general" });
 	app.register(kycRoutes, { prefix: "/v1/api/kyc" });
 	app.register(referralRoutes, { prefix: "/v1/api/referral" });
+	app.register(transactionRoutes, { prefix: "/v1/api/transactions" });
+	app.register(settingsRoutes, { prefix: "/v1/api/settings" });
+	app.register(traderRoutes, { prefix: "/v1/api/traders" });
 
 	// Socket
 

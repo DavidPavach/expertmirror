@@ -64,3 +64,14 @@ export function formatNowUtc(): string {
 
 	return `${monthName} ${day} ${year}, ${hours}:${minutesPadded}${ampm} UTC`;
 }
+
+export const coinIds = [
+	"bitcoin",
+	"ethereum",
+	"binancecoin",
+	"tron",
+	"tether",
+	"solana",
+	"litecoin",
+	"dogecoin",
+];

@@ -17,7 +17,9 @@ export default async function adminRoutes(app: FastifyInstance) {
 	appWithZod.post<{ Body: CreateAdminInput }>(
 		"/create",
 		{
+			preHandler: [app.authenticate, isSuperAdmin],
 			schema: {
+				security: [{ bearerAuth: [] }],
 				tags: ["Admins"],
 				body: createAdminSchema,
 			},

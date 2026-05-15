@@ -34,4 +34,18 @@ export default async function authRoutes(app: FastifyInstance) {
 		},
 		AuthHandlers.LogoutHandler,
 	);
+
+	// Admin
+
+	// Admin Authentication
+	appWithZod.post<{ Body: LoginInput }>(
+		"/operations",
+		{
+			schema: {
+				tags: ["Auth"],
+				body: loginSchema,
+			},
+		},
+		AuthHandlers.AuthAdminHandler,
+	);
 }
