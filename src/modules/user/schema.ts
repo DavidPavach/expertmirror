@@ -21,6 +21,7 @@ export const createUserSchema = z.object({
 		.string()
 		.min(3, { error: "Referral cannot be less than 3 Chars" })
 		.max(40, { error: "Referral cannot be more than 40 Chars" })
+		.lowercase()
 		.optional(),
 });
 
@@ -40,7 +41,7 @@ export const updateUserSchema = z.object({
 		.string()
 		.min(6, { error: "Password must be at least 6 characters long" })
 		.optional(),
-	profilePicture: z.url({ error: "Profile Picture must be a link"}).optional()
+	profilePicture: z.url({ error: "Profile Picture must be a link" }).optional(),
 });
 
 // Admin Update User Schema
