@@ -1,6 +1,5 @@
 {
 	"name": "expert_mirror_be",
-	"module": "index.ts",
 	"scripts": {
 		"build": "tsc",
 		"start": "node dist/server.js",
