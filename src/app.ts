@@ -87,7 +87,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
 
 	// Health Check Endpoint
 	app.get("/health", async () => {
-		return { status: "OK" };
+		return { status: "OK", timestamp: new Date().toISOString() };
 	});
 
 	// Global error handler
