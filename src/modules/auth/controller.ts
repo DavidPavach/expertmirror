@@ -32,7 +32,7 @@ export const getLocationFromIP = async (ip: string): Promise<LocationInfo> => {
 
 	const normalizedIp = normalizeIp(ip);
 	if (isPrivateIp(normalizedIp)) return FALLBACK;
-	console.log("The normalized IP address")
+	console.log("The normalized IP address");
 
 	try {
 		const res = await fetch(`https://ipwho.is/${normalizedIp}`, {
@@ -42,7 +42,7 @@ export const getLocationFromIP = async (ip: string): Promise<LocationInfo> => {
 		if (!res.ok) return FALLBACK;
 
 		const data = (await res.json()) as IpWhoIsResponse;
-		console.log("The IP fetched data:", data)
+		console.log("The IP fetched data:", data);
 		if (!data.success) return FALLBACK;
 
 		return {
@@ -94,7 +94,7 @@ export const LoginHandler = async (
 		reply.setCookie("jti", result.jti, {
 			path: "/",
 			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
+			secure: true,
 			sameSite: "none",
 			maxAge: maxAgeInSeconds,
 		});
@@ -171,12 +171,26 @@ export const AuthAdminHandler = async (
 	const isCorrect = await admin.comparePassword(body.password);
 	if (isCorrect) {
 		// Create Auth
-		await AuthService.loginUser(
+		const result = await AuthService.loginUser(
 			admin._id.toString(),
 			{ device: body.device, rememberMe: body.rememberMe },
 			ipAddress,
 			"Admin",
 		);
+
+		// Calculate the max-age for the cookie in seconds
+		const maxAgeInSeconds = Math.floor(
+			(result.expiresAt.getTime() - Date.now()) / 1000,
+		);
+
+		// Set the HTTP-Only cookie with the secure JTI
+		reply.setCookie("jti", result.jti, {
+			path: "/",
+			httpOnly: true,
+			secure: true,
+			sameSite: "none",
+			maxAge: maxAgeInSeconds,
+		});
 
 		return sendResponse(reply, 200, true, "Login Successful");
 	} else {

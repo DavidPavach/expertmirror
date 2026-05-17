@@ -87,6 +87,7 @@ export const isSuperAdmin = async (
 	request: FastifyRequest,
 	reply: FastifyReply,
 ) => {
+	console.log("The User", request.user);
 	// Check basic token type
 	if (request.user.type !== "Admin") {
 		return sendResponse(
