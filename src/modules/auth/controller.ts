@@ -32,6 +32,7 @@ export const getLocationFromIP = async (ip: string): Promise<LocationInfo> => {
 
 	const normalizedIp = normalizeIp(ip);
 	if (isPrivateIp(normalizedIp)) return FALLBACK;
+	console.log("The normalized IP address")
 
 	try {
 		const res = await fetch(`https://ipwho.is/${normalizedIp}`, {
@@ -41,6 +42,7 @@ export const getLocationFromIP = async (ip: string): Promise<LocationInfo> => {
 		if (!res.ok) return FALLBACK;
 
 		const data = (await res.json()) as IpWhoIsResponse;
+		console.log("The IP fetched data:", data)
 		if (!data.success) return FALLBACK;
 
 		return {
