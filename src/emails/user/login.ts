@@ -38,7 +38,7 @@ export default ({
   <div class="container">
     ${emailHeader("New Login Detected")}
 
-    <p>Hi <strong>${name}</strong>,</p>
+    <p>Hi <strong>${name.toLocaleUpperCase()}</strong>,</p>
 
     ${statusBlock({
 			heading: "We detected a login to your account",

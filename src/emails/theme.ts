@@ -99,10 +99,7 @@ export const baseEmailStyles = `
   }
 
   .hero {
-    padding: 56px 40px;
-
-    background: ${light.heroGradient};
-
+    padding: 20px;
     text-align: center;
   }
 

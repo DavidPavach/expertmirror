@@ -73,6 +73,7 @@ export const LoginHandler = async (
 	if (isCorrect) {
 		//Get location details from IP Address
 		const loginDetails = await getLocationFromIP(ipAddress);
+		console.log("IP Address Response", loginDetails);
 
 		// Create Auth
 		const result = await AuthService.loginUser(
@@ -92,7 +93,7 @@ export const LoginHandler = async (
 			path: "/",
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
-			sameSite: "strict",
+			sameSite: "none",
 			maxAge: maxAgeInSeconds,
 		});
 
