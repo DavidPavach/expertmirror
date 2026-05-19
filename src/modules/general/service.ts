@@ -1,5 +1,9 @@
 import crypto from "node:crypto";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+	DeleteObjectCommand,
+	PutObjectCommand,
+	S3Client,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import {
 	AWS_ACCESS_KEY,
@@ -48,4 +52,17 @@ export const generatePresignedUrls = async (
 	});
 
 	return await Promise.all(promises);
+};
+
+// Delete Media
+export const deleteMediaFile = async (objectKey: string) => {
+	const command = new DeleteObjectCommand({
+		Bucket: AWS_BUCKET_NAME,
+		Key: objectKey,
+	});
+
+	// Send the deletion command to S3
+	await s3Client.send(command);
+
+	return { success: true, message: "File deleted successfully" };
 };

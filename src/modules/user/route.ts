@@ -8,7 +8,9 @@ import {
 } from "../../middlewares/security.js";
 import {
 	type IdInput,
+	type IdStringInput,
 	idSchema,
+	idStringSchema,
 	type PaginationInput,
 	paginationSchema,
 } from "../general/schema.js";
@@ -113,16 +115,16 @@ export default async function userRoutes(app: FastifyInstance) {
 	);
 
 	// Fetch a User
-	appWithZod.get<{ Params: IdInput }>(
-		"/fetch/user/:id",
+	appWithZod.get<{ Params: IdStringInput }>(
+		"/fetch/user/:identifier",
 		{
 			preHandler: [app.authenticate, isAdmin],
 			schema: {
 				security: [{ bearerAuth: [] }],
 				tags: ["Users"],
-				params: idSchema,
+				params: idStringSchema,
 			},
 		},
-		UserHandlers.GetUserProfileHandler,
+		UserHandlers.GetAUserHandler,
 	);
 }

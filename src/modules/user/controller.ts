@@ -4,7 +4,11 @@ import welcome from "../../emails/user/welcome.js";
 import { sendAdminEmail, sendEmail } from "../../libs/mailer.js";
 import { sendResponse } from "../../utils/response.utils.js";
 import { deleteSession } from "../auth/service.js";
-import type { IdInput, PaginationInput } from "../general/schema.js";
+import type {
+	IdInput,
+	IdStringInput,
+	PaginationInput,
+} from "../general/schema.js";
 import { getKyc } from "../kyc/service.js";
 import { createReferral } from "../referral/service.js";
 import type {
@@ -139,27 +143,6 @@ export const AdminUpdateUserHandler = async (
 	return sendResponse(reply, 200, true, "User profile updated successfully");
 };
 
-// Get User By Id
-export const GetUserProfileHandler = async (
-	request: FastifyRequest<{ Params: IdInput }>,
-	reply: FastifyReply,
-) => {
-	const { id } = request.params;
-	const user = await UserService.getUserById(id);
-
-	if (!user) {
-		return sendResponse(reply, 404, false, "User not found");
-	}
-
-	return sendResponse(
-		reply,
-		200,
-		true,
-		"User Details was fetched successfully",
-		user,
-	);
-};
-
 // Fetch All Users
 export const GetAllUsersHandler = async (
 	request: FastifyRequest<{ Querystring: PaginationInput }>,
@@ -176,4 +159,18 @@ export const GetAllUsersHandler = async (
 		"Users were fetched successfully",
 		result,
 	);
+};
+
+// Fetch A User
+export const GetAUserHandler = async (
+	request: FastifyRequest<{ Params: IdStringInput }>,
+	reply: FastifyReply,
+) => {
+	const identifier = request.params.identifier;
+
+	// Fetch User and return
+	const user = await UserService.findUserByIdentifier(identifier);
+	if (!user) return sendResponse(reply, 404, false, "User Not Found");
+
+	return sendResponse(reply, 200, true, "User Fetched", user);
 };

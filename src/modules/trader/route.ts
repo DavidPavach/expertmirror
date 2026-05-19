@@ -9,10 +9,10 @@ import {
 } from "../general/schema.js";
 import * as TradersHandlers from "./controller.js";
 import {
-	type CreateCopyInput,
-	createCopySchema,
-	type UpdateCopyInput,
-	updateCopySchema,
+	type CreateTraderInput,
+	createTraderSchema,
+	type UpdateTraderInput,
+	updateTraderSchema,
 } from "./schema.js";
 
 export default async function traderRoutes(app: FastifyInstance) {
@@ -49,28 +49,28 @@ export default async function traderRoutes(app: FastifyInstance) {
 	// Admin
 
 	// Create Trader
-	appWithZod.post<{ Body: CreateCopyInput }>(
+	appWithZod.post<{ Body: CreateTraderInput }>(
 		"/new",
 		{
 			preHandler: [app.authenticate, isSuperAdmin],
 			schema: {
 				security: [{ bearerAuth: [] }],
 				tags: ["Traders"],
-				body: createCopySchema,
+				body: createTraderSchema,
 			},
 		},
 		TradersHandlers.CreateCopyHandler,
 	);
 
 	// Update Trader
-	appWithZod.patch<{ Params: IdInput; Body: UpdateCopyInput }>(
+	appWithZod.patch<{ Params: IdInput; Body: UpdateTraderInput }>(
 		"/update/:id",
 		{
 			preHandler: [app.authenticate, isSuperAdmin],
 			schema: {
 				security: [{ bearerAuth: [] }],
 				tags: ["Traders"],
-				body: updateCopySchema,
+				body: updateTraderSchema,
 				params: idSchema,
 			},
 		},

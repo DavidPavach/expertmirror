@@ -1,9 +1,10 @@
 import { z } from "zod";
 
 // Create
-export const createCopySchema = z.object({
+export const createTraderSchema = z.object({
 	name: z.string().min(2, { error: "Name is required" }).trim(),
 	title: z.string().min(2, { error: "Title is required" }).trim(),
+	bio: z.string({ error: "Bio is required" }).trim(),
 	profilePicture: z.url({ error: "Must be a valid URL" }),
 	active: z.boolean().default(true),
 	ratings: z.number({ error: "Ratings are required" }).min(0).max(5).default(0),
@@ -39,7 +40,7 @@ export const createCopySchema = z.object({
 });
 
 // Update
-export const updateCopySchema = createCopySchema.partial();
+export const updateTraderSchema = createTraderSchema.partial();
 
-export type CreateCopyInput = z.infer<typeof createCopySchema>;
-export type UpdateCopyInput = z.infer<typeof updateCopySchema>;
+export type CreateTraderInput = z.infer<typeof createTraderSchema>;
+export type UpdateTraderInput = z.infer<typeof updateTraderSchema>;

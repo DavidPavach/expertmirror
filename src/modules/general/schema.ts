@@ -13,6 +13,10 @@ export const idSchema = z.object({
 	id: objectIdValidator,
 });
 
+export const idStringSchema = z.object({
+	identifier: z.string({ error: "Identifier must be a string" }),
+});
+
 // Pagination Schema
 export const paginationSchema = z.object({
 	page: z.coerce
@@ -39,5 +43,6 @@ export const presignRequestSchema = z.object({
 });
 
 export type IdInput = z.infer<typeof idSchema>;
+export type IdStringInput = z.infer<typeof idStringSchema>;
 export type PaginationInput = z.infer<typeof paginationSchema>;
 export type PresignRequestInput = z.infer<typeof presignRequestSchema>;

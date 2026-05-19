@@ -164,3 +164,19 @@ export const getPaginatedUsers = async (page: number, limit: number) => {
 		},
 	};
 };
+
+// GET: Fetch a user
+export const findUserByIdentifier = async (identifier: string) => {
+	const lowerIdentifier = identifier.toLowerCase();
+
+	// Build the query
+	const query = UserModel.findOne({
+		$or: [
+			{ email: lowerIdentifier },
+			{ username: lowerIdentifier },
+			{ accountId: identifier },
+		],
+	});
+
+	return await query.exec();
+};

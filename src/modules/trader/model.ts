@@ -1,8 +1,9 @@
 import mongoose, { type Document, Schema } from "mongoose";
 
-export interface CopyDoc extends Document {
+export interface TraderDoc extends Document {
 	name: string;
 	title: string;
+	bio: string;
 	profilePicture: string;
 	active: boolean;
 	ratings: number;
@@ -17,10 +18,11 @@ export interface CopyDoc extends Document {
 	updatedAt: Date;
 }
 
-const copySchema = new Schema<CopyDoc>(
+const traderSchema = new Schema<TraderDoc>(
 	{
 		name: { type: String, required: true },
 		title: { type: String, required: true },
+		bio: { type: String, required: true },
 		profilePicture: { type: String, required: true },
 		active: { type: Boolean, default: true },
 		ratings: { type: Number, default: 0, min: 0, max: 5 },
@@ -35,5 +37,5 @@ const copySchema = new Schema<CopyDoc>(
 	{ timestamps: true },
 );
 
-const CopyModel = mongoose.model<CopyDoc>("Copy", copySchema);
-export default CopyModel;
+const TraderModel = mongoose.model<TraderDoc>("Trader", traderSchema);
+export default TraderModel;

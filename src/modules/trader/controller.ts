@@ -1,12 +1,12 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { sendResponse } from "../../utils/response.utils.js";
 import type { IdInput, PaginationInput } from "../general/schema.js";
-import type { CreateCopyInput, UpdateCopyInput } from "./schema.js";
+import type { CreateTraderInput, UpdateTraderInput } from "./schema.js";
 import * as TraderServices from "./service.js";
 
 // Create New Handler
 export const CreateCopyHandler = async (
-	request: FastifyRequest<{ Body: CreateCopyInput }>,
+	request: FastifyRequest<{ Body: CreateTraderInput }>,
 	reply: FastifyReply,
 ) => {
 	// Create and return response
@@ -42,7 +42,7 @@ export const GetCopyHandler = async (
 
 // Update Trader
 export const UpdateCopyHandler = async (
-	request: FastifyRequest<{ Params: IdInput; Body: UpdateCopyInput }>,
+	request: FastifyRequest<{ Params: IdInput; Body: UpdateTraderInput }>,
 	reply: FastifyReply,
 ) => {
 	const body = request.body;
