@@ -26,8 +26,12 @@ export const createKycSchema = z.object({
 		.string()
 		.min(5, { error: "Address must be more than 5 Chars" }),
 	city: z.string().min(2, { error: "City must be more than 2 Chars" }),
-	state: z.string().min(2, { error: "State must be more than 2 Chars" }),
-	country: z.string().min(2, { error: "Country must be more than 2 Chars" }),
+	stateProvince: z
+		.string()
+		.min(2, { error: "State or Province must be more than 2 Chars" }),
+	countryNationality: z
+		.string()
+		.min(2, { error: "Country must be more than 2 Chars" }),
 	documentType: DocumentTypeEnum,
 	frontSide: z.url({ error: "Must be a valid S3 URL" }),
 	backSide: z.url().optional(),

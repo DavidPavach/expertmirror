@@ -4,7 +4,10 @@ import { z } from "zod";
 export const transactionQuerySchema = z.object({
 	page: z.coerce.number().int().nonnegative().optional().default(1),
 	limit: z.coerce.number().int().nonnegative().optional().default(10),
-	type: z.enum(["DEPOSIT", "WITHDRAWAL", "BONUS", "PENALTY"]).optional(),
+	type: z
+		.enum(["DEPOSIT", "WITHDRAWAL", "BONUS", "PENALTY", "PROFIT"])
+		.optional(),
+	others: z.coerce.boolean().optional(),
 });
 
 // User Creation Schema

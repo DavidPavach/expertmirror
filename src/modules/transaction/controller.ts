@@ -83,12 +83,22 @@ export const GetMyTransactionsHandler = async (
 	reply: FastifyReply,
 ) => {
 	const userId = request.user.id;
-	const { page, limit, type } = request.query;
+	const { page, limit, type, others } = request.query;
 
-	// Add filters
-	const filters = { userId, ...(type && { type }) };
+	// Initialize the filters object with the userId
+	// biome-ignore lint/suspicious/noExplicitAny: <>
+	const filters: any = { userId };
 
+	if (others === true) {
+		filters.type = { $nin: ["DEPOSIT", "WITHDRAWAL"] };
+	} else if (type) {
+		filters.type = type;
+	}
+
+	// Pass the filters to your unified service
 	const result = await TxService.getPaginatedTransactions(page, limit, filters);
+
+	// Send the response
 	return sendResponse(
 		reply,
 		200,

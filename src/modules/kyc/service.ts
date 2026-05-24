@@ -1,4 +1,5 @@
 import { AppError } from "../../utils/error.js";
+import UserModel from "../user/model.js";
 import { KycModel } from "./model.js";
 import type { CreateKycInput, UpdateKycInput } from "./schema.js";
 
@@ -9,7 +10,9 @@ export const submitKyc = async (userId: string, input: CreateKycInput) => {
 		throw new AppError("KYC has already been submitted for this user.");
 	}
 
-	return await KycModel.create({ ...input, user: userId });
+	const newKyc = await KycModel.create({ ...input, user: userId });
+	await UserModel.findByIdAndUpdate(userId, { kycStatus: "PENDING" });
+	return newKyc;
 };
 
 // READ: Fetch a user KYC
@@ -59,6 +62,11 @@ export const updateKycById = async (
 		throw new AppError("KYC record not found", { statusCode: 404 });
 	}
 
+	if (updateData.status) {
+		await UserModel.findByIdAndUpdate(updatedKyc.user, {
+			kycStatus: updateData.status,
+		});
+	}
 	return updatedKyc;
 };
 
@@ -68,5 +76,8 @@ export const deleteKycById = async (kycId: string) => {
 	if (!result) {
 		throw new AppError("KYC record not found", { statusCode: 404 });
 	}
+	await UserModel.findByIdAndUpdate(result.user, {
+		kycStatus: "NOT STARTED",
+	});
 	return true;
 };

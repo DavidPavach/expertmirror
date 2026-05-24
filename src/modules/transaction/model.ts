@@ -2,7 +2,7 @@ import mongoose, { type Document, Schema } from "mongoose";
 
 export interface TransactionDoc extends Document {
 	user: mongoose.Types.ObjectId;
-	type: "DEPOSIT" | "WITHDRAWAL" | "BONUS" | "PENALTY";
+	type: "DEPOSIT" | "WITHDRAWAL" | "BONUS" | "PENALTY" | "PROFIT";
 	status: "PENDING" | "APPROVED" | "REJECTED";
 	amount: number;
 	cryptoSymbol: string;
@@ -17,7 +17,7 @@ const TransactionSchema = new Schema<TransactionDoc>(
 		user: { type: Schema.Types.ObjectId, required: true, ref: "User" },
 		type: {
 			type: String,
-			enum: ["DEPOSIT", "WITHDRAWAL", "BONUS", "PENALTY"],
+			enum: ["DEPOSIT", "WITHDRAWAL", "BONUS", "PENALTY", "PROFIT"],
 			required: true,
 		},
 		status: {

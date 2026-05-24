@@ -96,7 +96,7 @@ export default async function kycRoutes(app: FastifyInstance) {
 	);
 
 	// Delete User KYC
-	appWithZod.patch<{ Params: IdInput }>(
+	appWithZod.delete<{ Params: IdInput }>(
 		"/delete/user/:id",
 		{
 			preHandler: [app.authenticate, isSuperAdmin],

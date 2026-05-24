@@ -1,3 +1,4 @@
+import { AppError } from "../../utils/error.js";
 import TraderModel from "./model.js";
 import type { CreateTraderInput, UpdateTraderInput } from "./schema.js";
 
@@ -47,13 +48,14 @@ export const updateCopyTrader = async (
 		returnDocument: "after",
 		runValidators: true,
 	});
-	if (!updated) throw new Error("Copy trader not found");
+	if (!updated)
+		throw new AppError("Copy trader not found", { statusCode: 404 });
 	return updated;
 };
 
 // Delete copy trader
 export const deleteCopyTrader = async (id: string) => {
 	const result = await TraderModel.findByIdAndDelete(id);
-	if (!result) throw new Error("Copy trader not found");
+	if (!result) throw new AppError("Copy trader not found", { statusCode: 404 });
 	return true;
 };

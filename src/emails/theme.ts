@@ -104,8 +104,8 @@ export const baseEmailStyles = `
   }
 
   .logo {
-    width: 64px;
-    height: 64px;
+    width: 40px;
+    height: 40px;
 
     object-fit: contain;
 
@@ -115,7 +115,7 @@ export const baseEmailStyles = `
   .title {
     margin: 0;
 
-    font-size: 30px;
+    font-size: 24px;
     font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 1.1;

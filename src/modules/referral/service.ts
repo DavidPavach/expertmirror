@@ -36,6 +36,18 @@ export const getUserReferrals = async (
 	};
 };
 
+// Update Reward Amount
+export const updateReward = async (referredUserId: string, reward: number) => {
+	const updated = await ReferralModel.findOneAndUpdate(
+		{ _id: referredUserId },
+		{ rewardAmount: reward },
+		{
+			returnDocument: "after",
+		},
+	);
+	return updated;
+};
+
 // Admin Service
 
 // Update Referral Details

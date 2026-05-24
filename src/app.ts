@@ -13,11 +13,13 @@ import { COOKIE_SECRET } from "./config.js";
 import { authPlugin } from "./middlewares/auth.js";
 import adminRoutes from "./modules/admin/route.js";
 import authRoutes from "./modules/auth/route.js";
+import copyTradingRoutes from "./modules/copyTrading/route.js";
 import generalRoutes from "./modules/general/route.js";
 import kycRoutes from "./modules/kyc/route.js";
 import referralRoutes from "./modules/referral/routes.js";
 import settingsRoutes from "./modules/settings/route.js";
 import traderRoutes from "./modules/trader/route.js";
+import tradeRoutes from "./modules/trades/route.js";
 import transactionRoutes from "./modules/transaction/route.js";
 import userRoutes from "./modules/user/route.js";
 
@@ -82,6 +84,8 @@ export const buildApp = async (): Promise<FastifyInstance> => {
 	app.register(transactionRoutes, { prefix: "/v1/api/transactions" });
 	app.register(settingsRoutes, { prefix: "/v1/api/settings" });
 	app.register(traderRoutes, { prefix: "/v1/api/traders" });
+	app.register(tradeRoutes, { prefix: "/v1/api/trades" });
+	app.register(copyTradingRoutes, { prefix: "/v1/api/copy" });
 
 	// Socket
 
