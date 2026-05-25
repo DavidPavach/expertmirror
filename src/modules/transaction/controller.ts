@@ -87,7 +87,7 @@ export const GetMyTransactionsHandler = async (
 
 	// Initialize the filters object with the userId
 	// biome-ignore lint/suspicious/noExplicitAny: <>
-	const filters: any = { userId };
+	const filters: any = { user: userId };
 
 	if (others === true) {
 		filters.type = { $nin: ["DEPOSIT", "WITHDRAWAL"] };
