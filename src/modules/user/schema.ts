@@ -66,6 +66,7 @@ export const adminUpdateUserSchema = updateUserSchema.extend({
 
 // Admin Suspend User Schema
 export const adminSuspendSchema = z.object({
+	suspended: z.boolean(),
 	duration: z.coerce.number().int().default(1),
 });
 

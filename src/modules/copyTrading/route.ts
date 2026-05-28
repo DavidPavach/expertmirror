@@ -14,10 +14,16 @@ import {
 } from "../general/schema.js";
 import * as CopyTradingHandlers from "./controller.js";
 import {
+	type CopyIdInput,
+	copyIdSchema,
+	type RemoveEntryInput,
+	removeEntrySchema,
 	type StartCopyingInput,
 	startCopyingSchema,
 	type UpdateCopyStatsInput,
+	type UpdateEntryInput,
 	updateCopyStatsSchema,
+	updateEntrySchema,
 } from "./schema.js";
 
 export default async function copyTradingRoutes(app: FastifyInstance) {
@@ -93,5 +99,37 @@ export default async function copyTradingRoutes(app: FastifyInstance) {
 			},
 		},
 		CopyTradingHandlers.GetAllCopyTradings,
+	);
+
+	// Delete Entry
+	appWithZod.delete<{ Body: RemoveEntryInput }>(
+		"/removeEntry",
+		{
+			preHandler: [app.authenticate, isSuperAdmin],
+			schema: {
+				security: [{ bearerAuth: [] }],
+				tags: ["Copy"],
+				body: removeEntrySchema,
+			},
+		},
+		CopyTradingHandlers.RemoveCopyEntryHandler,
+	);
+
+	// Update Entry
+	appWithZod.patch<{
+		Params: CopyIdInput;
+		Body: UpdateEntryInput;
+	}>(
+		"/updateEntry/:copyTradingId/:entryId",
+		{
+			preHandler: [app.authenticate, isSuperAdmin],
+			schema: {
+				security: [{ bearerAuth: [] }],
+				tags: ["Copy"],
+				params: copyIdSchema,
+				body: updateEntrySchema,
+			},
+		},
+		CopyTradingHandlers.UpdateCopyEntryHandler,
 	);
 }

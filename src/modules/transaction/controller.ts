@@ -3,6 +3,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { COINGECKO_API_KEY } from "../../config.js";
 import { coinIds } from "../../utils/format.js";
 import { sendResponse } from "../../utils/response.utils.js";
+import { notify } from "../../utils/socket.js";
 import type { IdInput } from "../general/schema.js";
 import type {
 	AdminTransactionInput,
@@ -72,8 +73,18 @@ export const NewTransactionHandler = async (
 	const userId = request.user.id;
 	const body = request.body;
 
-	// Create Transaction and Return
-	await TxService.createUserTransaction(userId, body);
+	// Create Transaction, Notify and Return
+	const newTx = await TxService.createUserTransaction(userId, body);
+	notify({
+		userId: request.user.id,
+		trigger: "TRANSACTION",
+		save: true,
+		data: {
+			title: "Transaction Initialized! 🚀",
+			message: `Your ${newTx.type} transaction has been initialized successfully • Amount: ${newTx.amount.toLocaleString()} USD.`,
+			type: "SUCCESS",
+		},
+	});
 	return sendResponse(reply, 201, true, "Transaction initialized successfully");
 };
 
@@ -136,8 +147,18 @@ export const AdminCreateTransactionHandler = async (
 	const userId = request.params.id;
 	const body = request.body;
 
-	// Create Transaction and return
-	await TxService.createAdminTransaction(userId, body);
+	// Create Transaction, Notify and Return
+	const newTx = await TxService.createAdminTransaction(userId, body);
+	notify({
+		userId: newTx.user.toString(),
+		trigger: "TRANSACTION",
+		save: true,
+		data: {
+			title: "Transaction Created! 🚀",
+			message: `Your ${newTx.type} transaction has been created successfully • Amount: ${newTx.amount.toLocaleString()} USD.`,
+			type: "SUCCESS",
+		},
+	});
 	return sendResponse(reply, 201, true, "Admin transaction created");
 };
 
@@ -168,8 +189,18 @@ export const AdminUpdateTransactionHandler = async (
 ) => {
 	const body = request.body;
 
-	// Update Transaction and Return
-	await TxService.updateTransaction(request.params.id, body);
+	// Update Transaction, Notify and Return
+	const updatedTx = await TxService.updateTransaction(request.params.id, body);
+	notify({
+		userId: updatedTx.user.toString(),
+		trigger: "TRANSACTION",
+		save: true,
+		data: {
+			title: "Transaction Updated! 🚀",
+			message: `Your ${updatedTx.type} transaction was updated, • Status: ${updatedTx.status}.`,
+			type: "SUCCESS",
+		},
+	});
 	return sendResponse(reply, 200, true, "Transaction Updated");
 };
 

@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { sendResponse } from "../../utils/response.utils.js";
+import { notify } from "../../utils/socket.js";
 import type { IdInput, PaginationInput } from "../general/schema.js";
 import type { CreateKycInput, UpdateKycInput } from "./schema.js";
 import * as KycService from "./service.js";
@@ -12,8 +13,19 @@ export const SubmitKycHandler = async (
 	const body = request.body;
 	const userId = request.user.id;
 
-	// Create KYC and return
+	// Create KYC , Notify and return
 	await KycService.submitKyc(userId, body);
+
+	notify({
+		userId: userId,
+		trigger: "KYC",
+		save: true,
+		data: {
+			title: "KYC Submitted",
+			message: `Your KYC application has been submitted successfully.`,
+			type: "SUCCESS",
+		},
+	});
 	return sendResponse(reply, 201, true, "KYC submitted successfully");
 };
 
@@ -86,6 +98,17 @@ export const UpdateKycHandler = async (
 
 	// Update KYC and return
 	const updatedKyc = await KycService.updateKycById(id, body);
+
+	notify({
+		userId: updatedKyc.user.toString(),
+		trigger: "KYC",
+		save: true,
+		data: {
+			title: "KYC Update",
+			message: `Your KYC application has an update, kindly review it.`,
+			type: "SUCCESS",
+		},
+	});
 	return sendResponse(reply, 200, true, "KYC updated successfully", updatedKyc);
 };
 
@@ -96,7 +119,18 @@ export const DeleteKycHandler = async (
 ) => {
 	const { id } = request.params;
 
-	// Delete KYC and return
-	await KycService.deleteKycById(id);
+	// Delete KYC, Notify and return
+	const deletedKyc = await KycService.deleteKycById(id);
+
+	notify({
+		userId: deletedKyc.user.toString(),
+		trigger: "KYC",
+		save: true,
+		data: {
+			title: "KYC Deleted",
+			message: `Your KYC application has been deleted, due to not reaching the company's requirements, kindly restart the process.`,
+			type: "SUCCESS",
+		},
+	});
 	return sendResponse(reply, 200, true, "KYC record deleted successfully");
 };

@@ -56,7 +56,7 @@ export const updateKycById = async (
 	const updatedKyc = await KycModel.findByIdAndUpdate(kycId, updateData, {
 		returnDocument: "after",
 		runValidators: true,
-	}).populate("userId", "-password");
+	});
 
 	if (!updatedKyc) {
 		throw new AppError("KYC record not found", { statusCode: 404 });
@@ -79,5 +79,5 @@ export const deleteKycById = async (kycId: string) => {
 	await UserModel.findByIdAndUpdate(result.user, {
 		kycStatus: "NOT STARTED",
 	});
-	return true;
+	return result;
 };

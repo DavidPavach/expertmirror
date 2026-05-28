@@ -87,13 +87,16 @@ export const updateLastSession = async (userId: string) => {
 // Admin Services
 
 // UPDATE: Handles the suspension logic
-export const suspendUser = async (userId: string, durationInDays: number) => {
+export const suspendUser = async (
+	userId: string,
+	{ suspended, duration }: { suspended: boolean; duration: number },
+) => {
 	const user = await UserModel.findByIdAndUpdate(
 		userId,
 		{
-			suspended: true,
-			suspendedDate: new Date(),
-			suspensionDuration: durationInDays,
+			suspended: suspended,
+			suspendedDate: suspended ? new Date() : null,
+			suspensionDuration: suspended ? duration : null,
 		},
 		{ returnDocument: "after" },
 	).select("-password");
@@ -124,15 +127,7 @@ export const adminUpdateUser = async (
 		}
 	}
 
-	const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, {
-		returnDocument: "after",
-		runValidators: true,
-	}).select("-password");
-
-	if (!updatedUser) {
-		throw new AppError("User not found", { statusCode: 404 });
-	}
-
+	const updatedUser = await updateUser(userId, updateData);
 	return updatedUser;
 };
 

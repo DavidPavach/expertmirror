@@ -1,9 +1,16 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { sendResponse } from "../../utils/response.utils.js";
+import { notify } from "../../utils/socket.js";
 import type { IdInput, PaginationInput } from "../general/schema.js";
 import { getCopyTraderById } from "../trader/service.js";
 import { getUserDashboardStats } from "../transaction/service.js";
-import type { StartCopyingInput, UpdateCopyStatsInput } from "./schema.js";
+import type {
+	CopyIdInput,
+	RemoveEntryInput,
+	StartCopyingInput,
+	UpdateCopyStatsInput,
+	UpdateEntryInput,
+} from "./schema.js";
 import * as CopyInvestmentService from "./service.js";
 
 // Start a Copy Trading
@@ -12,7 +19,7 @@ export const StartCopyTradeHandler = async (
 	reply: FastifyReply,
 ) => {
 	const userId = request.user.id;
-	const masterTraderId = request.body.masterTraderId;
+	const { masterTraderId, amount } = request.body;
 
 	// Fetch Trader, throw an error if it doesn't exist
 	const trader = await getCopyTraderById(masterTraderId);
@@ -20,7 +27,7 @@ export const StartCopyTradeHandler = async (
 
 	// Make sure the user has available balance
 	const { availableBalance } = await getUserDashboardStats(userId);
-	if (availableBalance < trader.minInvestment)
+	if (availableBalance < trader.minInvestment || availableBalance < amount)
 		return sendResponse(
 			reply,
 			400,
@@ -28,13 +35,25 @@ export const StartCopyTradeHandler = async (
 			"You do not have the balance to copy this trader.",
 		);
 
-	// Create copy trading and return
+	// Create copy trading, notify return
 	await CopyInvestmentService.startCopying(
 		userId,
 		masterTraderId,
-		trader.minInvestment,
-		trader.minInvestment,
+		amount,
+		amount,
 	);
+
+	// Notify User
+	notify({
+		userId: userId,
+		trigger: "COPY_TRADING",
+		save: true,
+		data: {
+			title: "Copy Trading Activated",
+			message: `You are now successfully copying ${trader.name}. Their trades will automatically mirror on your account.`,
+			type: "INFO",
+		},
+	});
 	return sendResponse(reply, 201, true, "Successfully copying trader");
 };
 
@@ -57,8 +76,28 @@ export const StopCopyTraderHandler = async (
 ) => {
 	const id = request.params.id;
 
-	// Update and Return
+	const copyTrading = await CopyInvestmentService.getCopyTradingById(id);
+	if (!copyTrading)
+		return sendResponse(reply, 404, false, "Copy Trading not found");
+
+	const trader = await getCopyTraderById(copyTrading.masterTraderId.toString());
+	if (!trader)
+		return sendResponse(reply, 404, false, "Master Trader not found");
+
+	// Update, Notify and Return
 	await CopyInvestmentService.closeCopyTrading(id);
+
+	// Notify User
+	notify({
+		userId: copyTrading.user.toString(),
+		trigger: "COPY_TRADING",
+		save: true,
+		data: {
+			title: "Copy Trading Stopped",
+			message: `Your Copy trading subscription to ${trader.name} has been paused.`,
+			type: "WARNING",
+		},
+	});
 	return sendResponse(reply, 200, true, "Investment closed successfully");
 };
 
@@ -72,8 +111,27 @@ export const UpdateCopyTradeHandler = async (
 	const body = request.body;
 	const id = request.params.id;
 
-	// Update and return
+	const copyTrading = await CopyInvestmentService.getCopyTradingById(id);
+	if (!copyTrading)
+		return sendResponse(reply, 404, false, "Copy Trading not found");
+
+	const trader = await getCopyTraderById(copyTrading.masterTraderId.toString());
+	if (!trader)
+		return sendResponse(reply, 404, false, "Master Trader not found");
+
+	// Update, notify and return
 	await CopyInvestmentService.updateCopyTrading(id, body);
+
+	notify({
+		userId: copyTrading.user.toString(),
+		trigger: "COPY_TRADING",
+		save: true,
+		data: {
+			title: "Copy Trading Updated",
+			message: `Your Copy trading subscription to ${trader.name} has been updated.`,
+			type: "INFO",
+		},
+	});
 	return sendResponse(reply, 200, true, "Stats updated");
 };
 
@@ -93,4 +151,32 @@ export const GetAllCopyTradings = async (
 		"Copy Tradings were fetched successfully",
 		result,
 	);
+};
+
+// Remove Entry
+export const RemoveCopyEntryHandler = async (
+	request: FastifyRequest<{ Body: RemoveEntryInput }>,
+	reply: FastifyReply,
+) => {
+	const { copyTradingId, entryId } = request.body;
+
+	// Update and return
+	await CopyInvestmentService.removeEntry(copyTradingId, entryId);
+	return sendResponse(reply, 200, true, "Entry removed successfully");
+};
+
+// Update Entry
+export const UpdateCopyEntryHandler = async (
+	request: FastifyRequest<{
+		Params: CopyIdInput;
+		Body: UpdateEntryInput;
+	}>,
+	reply: FastifyReply,
+) => {
+	const { copyTradingId, entryId } = request.params;
+	const body = request.body;
+
+	// Update and return
+	await CopyInvestmentService.updateEntry(copyTradingId, entryId, body);
+	return sendResponse(reply, 200, true, "Entry updated successfully");
 };

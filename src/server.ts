@@ -3,6 +3,7 @@ import { buildApp } from "./app.js";
 
 //Config
 import { DATABASE_URL, PORT } from "./config.js";
+import { initSocket } from "./utils/socket.js";
 
 const startServer = async () => {
 	const app = await buildApp();
@@ -20,6 +21,9 @@ const startServer = async () => {
 	try {
 		await connectToDatabase();
 		await app.listen({ port: PORT, host: "0.0.0.0" });
+
+		const server = app.server;
+		initSocket(server);
 	} catch (err) {
 		app.log.error(err);
 		process.exit(1);

@@ -16,6 +16,7 @@ import authRoutes from "./modules/auth/route.js";
 import copyTradingRoutes from "./modules/copyTrading/route.js";
 import generalRoutes from "./modules/general/route.js";
 import kycRoutes from "./modules/kyc/route.js";
+import notificationRoutes from "./modules/notification/route.js";
 import referralRoutes from "./modules/referral/routes.js";
 import settingsRoutes from "./modules/settings/route.js";
 import traderRoutes from "./modules/trader/route.js";
@@ -49,7 +50,7 @@ declare module "fastify" {
 export const buildApp = async (): Promise<FastifyInstance> => {
 	const app: FastifyInstance = Fastify({
 		logger: { level: "info" },
-		trustProxy: true,
+		trustProxy: 3,
 	}).withTypeProvider<ZodTypeProvider>();
 
 	// Register Zod compilers to Fastify (so Fastify uses Zod for validation)
@@ -86,8 +87,7 @@ export const buildApp = async (): Promise<FastifyInstance> => {
 	app.register(traderRoutes, { prefix: "/v1/api/traders" });
 	app.register(tradeRoutes, { prefix: "/v1/api/trades" });
 	app.register(copyTradingRoutes, { prefix: "/v1/api/copy" });
-
-	// Socket
+	app.register(notificationRoutes, { prefix: "/v1/api/notification" });
 
 	// Health Check Endpoint
 	app.get("/health", async () => {

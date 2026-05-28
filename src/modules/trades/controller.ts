@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { sendResponse } from "../../utils/response.utils.js";
+import { notify } from "../../utils/socket.js";
 import type { IdInput, PaginationInput } from "../general/schema.js";
 import type { CloseTradeInput, CreateTradeInput } from "./schema.js";
 import * as TradeService from "./service.js";
@@ -11,8 +12,19 @@ export const OpenTradeHandler = async (
 ) => {
 	const body = request.body;
 
-	// Create Trade and Return
+	// Create Trade, Notify and Return
 	await TradeService.openTrade(request.user.id, body);
+
+	notify({
+		userId: request.user.id,
+		trigger: "TRADE",
+		save: true,
+		data: {
+			title: "Trade Opened! 🚀",
+			message: `Your trade has been opened successfully.`,
+			type: "SUCCESS",
+		},
+	});
 	return sendResponse(reply, 200, true, "Trade opened");
 };
 
@@ -43,8 +55,18 @@ export const CloseTradeHandler = async (
 ) => {
 	const body = request.body;
 
-	// Close Trade and Return
-	await TradeService.closeTrade(request.params.id, body);
+	// Close Trade, Notify and Return
+	const closedTrade = await TradeService.closeTrade(request.params.id, body);
+	notify({
+		userId: closedTrade.user.toString(),
+		trigger: "TRADE",
+		save: true,
+		data: {
+			title: "Trade Closed! 🚀",
+			message: `Your trade has been closed successfully.`,
+			type: "SUCCESS",
+		},
+	});
 	return sendResponse(reply, 200, true, "Trade closed");
 };
 

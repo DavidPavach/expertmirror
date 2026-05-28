@@ -3,8 +3,9 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import generalTemplate from "../../emails/admin/general.js";
 import login from "../../emails/user/login.js";
 import { sendAdminEmail, sendEmail } from "../../libs/mailer.js";
-import { formatWithTimezone } from "../../utils/format.js";
+import { formatNowUtc, formatWithTimezone } from "../../utils/format.js";
 import { sendResponse } from "../../utils/response.utils.js";
+import { notify } from "../../utils/socket.js";
 import { getAdminByEmail } from "../admin/service.js";
 import * as UserService from "../user/service.js";
 import type { LoginInput } from "./schema.js";
@@ -63,6 +64,7 @@ export const LoginHandler = async (
 ) => {
 	const body = request.body;
 	const ipAddress = request.ip;
+	console.log("The IP Address", ipAddress);
 
 	// Fetch User Details
 	const user = await UserService.getUser(body.identifier);
@@ -128,7 +130,17 @@ export const LoginHandler = async (
 			sendAdminEmail(adminTemplate),
 		]);
 
-		// Send the success response
+		// Send Notification and Success Response
+		notify({
+			userId: user._id.toString(),
+			trigger: "SYSTEM",
+			save: true,
+			data: {
+				title: "New Login",
+				message: `New login detected from IP: ${ipAddress} • Device: ${body.device.type} • Browser: ${body.device.browser} • OS:${body.device.os} • User agent: ${body.device.ua} • Time: ${formatNowUtc()}`,
+				type: "INFO",
+			},
+		});
 		return sendResponse(reply, 200, true, "Login Successful");
 	} else {
 		return sendResponse(reply, 400, false, "Incorrect Email or Password");

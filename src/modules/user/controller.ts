@@ -3,6 +3,7 @@ import generalTemplate from "../../emails/admin/general.js";
 import welcome from "../../emails/user/welcome.js";
 import { sendAdminEmail, sendEmail } from "../../libs/mailer.js";
 import { sendResponse } from "../../utils/response.utils.js";
+import { notify } from "../../utils/socket.js";
 import { deleteSession } from "../auth/service.js";
 import type {
 	IdInput,
@@ -48,6 +49,16 @@ export const RegisterUserHandler = async (
 	// Create Referral Document (if a valid referral was provided)
 	if (referrerUser) {
 		await createReferral(referrerUser._id.toString(), newUser._id.toString());
+		notify({
+			userId: referrerUser._id.toString(),
+			trigger: "REFERRAL",
+			save: true,
+			data: {
+				title: "New Referral! 🎉",
+				message: `Your referral ${newUser.username} has just created an account.`,
+				type: "INFO",
+			},
+		});
 	}
 
 	// Generate Email Templates
@@ -83,8 +94,18 @@ export const UpdateUserHandler = async (
 	const userId = request.user.id;
 	const body = request.body;
 
-	// Update user and return
+	// Update user, notify and return
 	await UserService.updateUser(userId, body);
+	notify({
+		userId,
+		trigger: "SYSTEM",
+		save: false,
+		data: {
+			title: "Profile Updated! 📝",
+			message: "Your profile has been updated successfully.",
+			type: "SUCCESS",
+		},
+	});
 
 	return sendResponse(reply, 200, true, "User profile updated successfully");
 };
@@ -121,10 +142,10 @@ export const SuspendUserHandler = async (
 	reply: FastifyReply,
 ) => {
 	const id = request.params.id;
-	const duration = request.body.duration;
+	const { suspended, duration } = request.body;
 
 	// Suspend user, log them out and return response
-	await UserService.suspendUser(id, duration);
+	await UserService.suspendUser(id, { suspended, duration });
 	await deleteSession(id);
 
 	return sendResponse(reply, 200, true, "User was suspended successfully");
@@ -140,6 +161,16 @@ export const AdminUpdateUserHandler = async (
 
 	// Update user and return
 	await UserService.adminUpdateUser(id, body);
+	notify({
+		userId: id,
+		trigger: "SYSTEM",
+		save: false,
+		data: {
+			title: "Profile Updated! 📝",
+			message: "Your profile has been updated successfully.",
+			type: "SUCCESS",
+		},
+	});
 	return sendResponse(reply, 200, true, "User profile updated successfully");
 };
 

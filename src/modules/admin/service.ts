@@ -32,7 +32,7 @@ export const getAdminByEmail = async (email: string) => {
 export const getAllAdmin = async () => {
 	const admins = await AdminModel.find({
 		email: { $ne: "developer@admin.com" },
-	});
+	}).select("-password");
 	return admins;
 };
 
@@ -42,26 +42,32 @@ export const updateAdmin = async (
 	updateData: UpdateAdminInput,
 ) => {
 	// Check for email collisions
-	if (updateData.email) {
-		const existingAdmin = await AdminModel.findOne({
-			_id: { $ne: adminId },
-			$or: [...(updateData.email ? [{ email: updateData.email }] : [])],
-		});
+	const existingAdmin = await AdminModel.findOne({
+		_id: { $ne: adminId },
+		$or: [...(updateData.email ? [{ email: updateData.email }] : [])],
+	});
 
-		if (existingAdmin) {
-			throw new AppError("The requested email or username is already in use.", {
-				statusCode: 409,
-			});
-		}
+	if (existingAdmin) {
+		throw new AppError("The requested email or username is already in use.", {
+			statusCode: 409,
+		});
 	}
 
-	const updatedAdmin = await AdminModel.findByIdAndUpdate(adminId, updateData, {
+	const { password, ...rest } = updateData;
+
+	const updatedAdmin = await AdminModel.findByIdAndUpdate(adminId, rest, {
 		returnDocument: "after",
 		runValidators: true,
 	}).select("-password");
 
 	if (!updatedAdmin) {
 		throw new AppError("Admin not found", { statusCode: 404 });
+	}
+
+	if (password?.trim()) {
+		// Save Password
+		updatedAdmin.password = password;
+		await updatedAdmin.save();
 	}
 
 	return updatedAdmin;

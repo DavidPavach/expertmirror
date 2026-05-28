@@ -1,6 +1,6 @@
 import { AppError } from "../../utils/error.js";
 import CopyTradingModel from "./model.js";
-import type { UpdateCopyStatsInput } from "./schema.js";
+import type { UpdateCopyStatsInput, UpdateEntryInput } from "./schema.js";
 
 // Create new copy trading
 export const startCopying = async (
@@ -29,11 +29,17 @@ export const startCopying = async (
 	});
 };
 
-// User GEt Copy Trading
+// User Get Copy Trading
 export const getUserCopyTrading = async (userId: string) => {
 	return await CopyTradingModel.find({ user: userId })
 		.populate("masterTraderId")
-		.sort({ createdAt: -1 });
+		.sort({ createdAt: -1 })
+		.lean();
+};
+
+// Fetch Copy Trading by ID
+export const getCopyTradingById = async (id: string) => {
+	return await CopyTradingModel.findById(id).populate("masterTraderId").lean();
 };
 
 // Update Copy Trading
@@ -41,11 +47,31 @@ export const updateCopyTrading = async (
 	id: string,
 	stats: UpdateCopyStatsInput,
 ) => {
-	const updated = await CopyTradingModel.findByIdAndUpdate(id, stats, {
+	// Separate the entries array from the standard fields
+	const { entries, ...primitiveStats } = stats;
+
+	// biome-ignore lint/suspicious/noExplicitAny: <>
+	const updateQuery: any = {};
+
+	if (Object.keys(primitiveStats).length > 0) {
+		updateQuery.$set = primitiveStats;
+	}
+
+	if (entries && entries.length > 0) {
+		updateQuery.$push = {
+			entries: { $each: entries },
+		};
+	}
+
+	const updated = await CopyTradingModel.findByIdAndUpdate(id, updateQuery, {
 		returnDocument: "after",
+		runValidators: true,
 	});
-	if (!updated)
+
+	if (!updated) {
 		throw new AppError("Copy Trader not found", { statusCode: 404 });
+	}
+
 	return updated;
 };
 
@@ -87,4 +113,63 @@ export const fetchAllCopyTrading = async (page: number, limit: number) => {
 			totalPages,
 		},
 	};
+};
+
+// Remove Entry
+export const removeEntry = async (copyTradingId: string, entryId: string) => {
+	const updated = await CopyTradingModel.findByIdAndUpdate(
+		copyTradingId,
+		{
+			$pull: { entries: { _id: entryId } },
+		},
+		{ returnDocument: "after" },
+	);
+
+	if (!updated) {
+		throw new AppError("Copy Trader not found", { statusCode: 404 });
+	}
+
+	return updated;
+};
+
+// Update Entry
+export const updateEntry = async (
+	copyTradingId: string,
+	entryId: string,
+	updateData: UpdateEntryInput,
+) => {
+	const setUpdate: Record<string, string | number | Date> = {};
+
+	if (updateData.date) {
+		setUpdate["entries.$.date"] = updateData.date;
+	}
+	if (updateData.percentChange !== undefined) {
+		setUpdate["entries.$.percentChange"] = updateData.percentChange;
+	}
+	if (updateData.price !== undefined) {
+		setUpdate["entries.$.price"] = updateData.price;
+	}
+
+	// Perform the database update
+	const updated = await CopyTradingModel.findOneAndUpdate(
+		{
+			_id: copyTradingId,
+			"entries._id": entryId,
+		},
+		{
+			$set: setUpdate,
+		},
+		{
+			returnDocument: "after",
+			runValidators: true,
+		},
+	);
+
+	if (!updated) {
+		throw new AppError("Copy Trader or specific Entry not found", {
+			statusCode: 404,
+		});
+	}
+
+	return updated;
 };
