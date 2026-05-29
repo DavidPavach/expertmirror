@@ -4,6 +4,7 @@ import {
 	isAdmin,
 	isSuperAdmin,
 	isSuspended,
+	isUser,
 } from "../../middlewares/security.js";
 import { type IdInput, idSchema } from "../general/schema.js";
 import * as TransactionHandlers from "./controller.js";
@@ -27,7 +28,7 @@ export default async function transactionRoutes(app: FastifyInstance) {
 	appWithZod.get(
 		"/prices",
 		{
-			preHandler: [app.authenticate],
+			preHandler: [app.authenticate, isUser],
 			schema: {
 				security: [{ bearerAuth: [] }],
 				tags: ["Transactions"],
@@ -54,7 +55,7 @@ export default async function transactionRoutes(app: FastifyInstance) {
 	appWithZod.get<{ Querystring: TransactionQueryInput }>(
 		"/get",
 		{
-			preHandler: [app.authenticate],
+			preHandler: [app.authenticate, isUser],
 			schema: {
 				security: [{ bearerAuth: [] }],
 				tags: ["Transactions"],
@@ -68,7 +69,7 @@ export default async function transactionRoutes(app: FastifyInstance) {
 	appWithZod.get(
 		"/dashboard",
 		{
-			preHandler: [app.authenticate],
+			preHandler: [app.authenticate, isUser],
 			schema: {
 				security: [{ bearerAuth: [] }],
 				tags: ["Transactions"],

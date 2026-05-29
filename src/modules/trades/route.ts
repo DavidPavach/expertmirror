@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import {
+	isAdmin,
 	isSuperAdmin,
 	isSuspended,
 	isUser,
@@ -54,7 +55,7 @@ export default async function tradeRoutes(app: FastifyInstance) {
 
 	// Close a Trade
 	appWithZod.patch<{ Params: IdInput; Body: CloseTradeInput }>(
-		"/close",
+		"/close/:id",
 		{
 			preHandler: [app.authenticate, isSuperAdmin],
 			schema: {
@@ -69,7 +70,7 @@ export default async function tradeRoutes(app: FastifyInstance) {
 
 	// Delete a Trade
 	appWithZod.delete<{ Params: IdInput }>(
-		"/delete",
+		"/delete/:id",
 		{
 			preHandler: [app.authenticate, isSuperAdmin],
 			schema: {
@@ -85,7 +86,7 @@ export default async function tradeRoutes(app: FastifyInstance) {
 	appWithZod.get<{ Querystring: PaginationInput }>(
 		"/getAll",
 		{
-			preHandler: [app.authenticate, isUser],
+			preHandler: [app.authenticate, isAdmin],
 			schema: {
 				security: [{ bearerAuth: [] }],
 				tags: ["Trades"],
