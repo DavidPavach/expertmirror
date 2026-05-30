@@ -19,31 +19,15 @@ const FALLBACK: LocationInfo = {
 	timezone: "UTC",
 };
 
-const normalizeIp = (ip: string): string => ip.replace("::ffff:", "").trim();
-
-const isPrivateIp = (ip: string): boolean =>
-	ip === "127.0.0.1" ||
-	ip === "::1" ||
-	ip.startsWith("10.") ||
-	ip.startsWith("192.168.") ||
-	ip.startsWith("172.16.");
-
 export const getLocationFromIP = async (ip: string): Promise<LocationInfo> => {
 	if (!ip) return FALLBACK;
 
-	const normalizedIp = normalizeIp(ip);
-	if (isPrivateIp(normalizedIp)) return FALLBACK;
-	console.log("The normalized IP address");
-
 	try {
-		const res = await fetch(`https://ipwho.is/${normalizedIp}`, {
-			headers: { "User-Agent": "kyc-service/1.0" },
-		});
+		const res = await fetch(`https://ipwho.is/${ip}`);
 
 		if (!res.ok) return FALLBACK;
 
 		const data = (await res.json()) as IpWhoIsResponse;
-		console.log("The IP fetched data:", data);
 		if (!data.success) return FALLBACK;
 
 		return {
@@ -64,7 +48,6 @@ export const LoginHandler = async (
 ) => {
 	const body = request.body;
 	const ipAddress = request.ip;
-	console.log("The IP Address", ipAddress);
 
 	// Fetch User Details
 	const user = await UserService.getUser(body.identifier);
@@ -77,7 +60,6 @@ export const LoginHandler = async (
 	if (isCorrect) {
 		//Get location details from IP Address
 		const loginDetails = await getLocationFromIP(ipAddress);
-		console.log("IP Address Response", loginDetails);
 
 		// Create Auth
 		const result = await AuthService.loginUser(

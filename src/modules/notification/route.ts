@@ -38,7 +38,7 @@ export default async function notificationRoutes(app: FastifyInstance) {
 
 	// Mark Notification as Read
 	appWithZod.patch<{ Params: IdInput }>(
-		"/mark",
+		"/mark/:id",
 		{
 			preHandler: [app.authenticate, isUser],
 			schema: {
@@ -52,7 +52,7 @@ export default async function notificationRoutes(app: FastifyInstance) {
 
 	// Delete Notification
 	appWithZod.delete<{ Params: IdInput }>(
-		"/delete",
+		"/delete/:id",
 		{
 			preHandler: [app.authenticate, isSuspended],
 			schema: {
