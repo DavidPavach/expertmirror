@@ -22,8 +22,14 @@ import {
 	adminUpdateUserSchema,
 	type CreateUserInput,
 	createUserSchema,
+	type PasswordResetEmailInput,
+	passwordResetEmailSchema,
+	passwordResetSchema,
+	type ResetPasswordInput,
 	type UpdateUserInput,
 	updateUserSchema,
+	type VerifyPasswordResetInput,
+	verifyPasswordResetSchema,
 } from "./schema.js";
 
 export default async function userRoutes(app: FastifyInstance) {
@@ -66,6 +72,42 @@ export default async function userRoutes(app: FastifyInstance) {
 			},
 		},
 		UserHandlers.UpdateUserHandler,
+	);
+
+	// Send Forgot Password Email
+	appWithZod.post<{ Body: PasswordResetEmailInput }>(
+		"/reset",
+		{
+			schema: {
+				tags: ["Users"],
+				body: passwordResetEmailSchema,
+			},
+		},
+		UserHandlers.SendPasswordResetHandler,
+	);
+
+	// Verify Reset Email
+	appWithZod.post<{ Body: VerifyPasswordResetInput }>(
+		"/verify-reset",
+		{
+			schema: {
+				tags: ["Users"],
+				body: verifyPasswordResetSchema,
+			},
+		},
+		UserHandlers.VerifyPasswordResetHandler,
+	);
+
+	// Password Reset
+	appWithZod.post<{ Body: ResetPasswordInput }>(
+		"/password-reset",
+		{
+			schema: {
+				tags: ["Users"],
+				body: passwordResetSchema,
+			},
+		},
+		UserHandlers.PasswordResetHandler,
 	);
 
 	// Admin Routes

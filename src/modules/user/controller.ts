@@ -1,5 +1,7 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
+import { customAlphabet } from "nanoid";
 import generalTemplate from "../../emails/admin/general.js";
+import forgotPassword from "../../emails/user/forgotPassword.js";
 import welcome from "../../emails/user/welcome.js";
 import { sendAdminEmail, sendEmail } from "../../libs/mailer.js";
 import { sendResponse } from "../../utils/response.utils.js";
@@ -16,7 +18,10 @@ import type {
 	AdminSuspendInput,
 	AdminUpdateUserInput,
 	CreateUserInput,
+	PasswordResetEmailInput,
+	ResetPasswordInput,
 	UpdateUserInput,
+	VerifyPasswordResetInput,
 } from "./schema.js";
 import * as UserService from "./service.js";
 
@@ -131,6 +136,108 @@ export const CurrentUserHandler = async (
 		true,
 		"User Details was fetched successfully",
 		{ ...user, kycStatus: !kyc ? "NOT STARTED" : kyc.status },
+	);
+};
+
+// Send Password Reset OTP
+export const SendPasswordResetHandler = async (
+	request: FastifyRequest<{ Body: PasswordResetEmailInput }>,
+	reply: FastifyReply,
+) => {
+	const { email } = request.body;
+
+	// Fetch user by email, throw an error if it doesn't exist, or if the user hasn't verified their account
+	const user = await UserService.getUser(email.toLowerCase());
+	if (!user) return sendResponse(reply, 400, false, "Incorrect Email");
+
+	// Generate 6 Random Digits and Save
+	const randomSixNumbers = customAlphabet("0123456789", 6)();
+
+	// Save the number to the database
+	user.passwordResetCode = randomSixNumbers;
+	await user.save();
+
+	// Send email to the email address with the 4 Digit
+	const emailContent = forgotPassword({
+		name: user.username,
+		verificationCode: randomSixNumbers,
+	});
+	await sendEmail({
+		to: user.email,
+		subject: "Reset Password Verification",
+		html: emailContent.html,
+	});
+
+	return sendResponse(
+		reply,
+		200,
+		true,
+		"A verification code will be sent if the email is associated with an account.",
+	);
+};
+
+// Verify Password Reset OPT
+const otpStorage = new Map();
+
+export const VerifyPasswordResetHandler = async (
+	request: FastifyRequest<{ Body: VerifyPasswordResetInput }>,
+	reply: FastifyReply,
+) => {
+	const { email, otp } = request.body;
+
+	// Fetch user and throw an error if user doesn't exist or entered a wrong OTP
+	const user = await UserService.getUser(email);
+	if (!user) return sendResponse(reply, 400, false, "User does not exist");
+	if (user.passwordResetCode !== otp)
+		return sendResponse(reply, 400, false, "Incorrect OTP");
+
+	// Make the user password field null again
+	user.passwordResetCode = "000000";
+	await user.save();
+	otpStorage.set(email, email);
+
+	return sendResponse(reply, 200, true, "Email was verified successfully.");
+};
+
+// Create new password
+export const PasswordResetHandler = async (
+	request: FastifyRequest<{ Body: ResetPasswordInput }>,
+	reply: FastifyReply,
+) => {
+	const { email, password } = request.body;
+	const user = await UserService.getUser(email);
+
+	if (!user) return sendResponse(reply, 400, false, "User does not exist");
+
+	// Check if the User has been verified
+	if (!otpStorage.has(email))
+		return sendResponse(
+			reply,
+			400,
+			false,
+			"Something went wrong kindly restart the password reset process.",
+		);
+
+	// Save users new password
+	user.password = password;
+	await user.save();
+
+	notify({
+		userId: user._id.toString(),
+		trigger: "SYSTEM",
+		save: false,
+		data: {
+			title: "Password Updated!",
+			message: "Your Password has been updated successfully.",
+			type: "SUCCESS",
+		},
+	});
+
+	return sendResponse(
+		reply,
+		200,
+		true,
+		"Your password was updated successfully.",
 	);
 };
 

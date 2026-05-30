@@ -64,6 +64,40 @@ export const adminUpdateUserSchema = updateUserSchema.extend({
 		.optional(),
 });
 
+// Password Reset
+export const passwordResetEmailSchema = z.object({
+	email: z.email({
+		error: "Email is required",
+	}),
+});
+
+// Verify Password
+export const verifyPasswordResetSchema = z.object({
+	email: z.email({
+		error: "Email is required",
+	}),
+
+	otp: z
+		.string({
+			error: "OTP is required",
+		})
+		.min(6, { error: "Password cannot be less than size(6) numbers" })
+		.max(6, { error: "Password cannot be more than six(6) numbers" }),
+});
+
+// New Password
+export const passwordResetSchema = z.object({
+	email: z.email({
+		error: "Email is required",
+	}),
+
+	password: z
+		.string({
+			error: "Password is required",
+		})
+		.min(6, { error: "Password too short - should be 6 Chars minimum" }),
+});
+
 // Admin Suspend User Schema
 export const adminSuspendSchema = z.object({
 	suspended: z.boolean(),
@@ -72,5 +106,11 @@ export const adminSuspendSchema = z.object({
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+export type PasswordResetEmailInput = z.infer<typeof passwordResetEmailSchema>;
+export type VerifyPasswordResetInput = z.infer<
+	typeof verifyPasswordResetSchema
+>;
+export type ResetPasswordInput = z.infer<typeof passwordResetSchema>;
+
 export type AdminUpdateUserInput = z.infer<typeof adminUpdateUserSchema>;
 export type AdminSuspendInput = z.infer<typeof adminSuspendSchema>;

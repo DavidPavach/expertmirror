@@ -16,6 +16,7 @@ export interface UserDoc extends Document {
 	suspended: boolean;
 	suspendedDate?: Date;
 	suspensionDuration?: number;
+	passwordResetCode: string;
 	kycStatus: "PENDING" | "APPROVED" | "REJECTED" | "NOT STARTED";
 	withdrawalKey: string;
 	createdAt: Date;
@@ -48,6 +49,7 @@ const userSchema = new Schema<UserDoc>(
 			enum: ["PENDING", "APPROVED", "REJECTED", "NOT STARTED"],
 			default: "NOT STARTED",
 		},
+		passwordResetCode: { type: String, default: "000000" },
 	},
 	{ timestamps: true },
 );

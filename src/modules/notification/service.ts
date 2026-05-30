@@ -53,7 +53,7 @@ export const markAsRead = async (notificationId: string) => {
 	return await NotificationModel.findByIdAndUpdate(
 		notificationId,
 		{ isRead: true },
-		{ new: true },
+		{ returnDocument: "after" },
 	);
 };
 

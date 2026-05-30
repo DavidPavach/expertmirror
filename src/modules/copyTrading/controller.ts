@@ -80,7 +80,9 @@ export const StopCopyTraderHandler = async (
 	if (!copyTrading)
 		return sendResponse(reply, 404, false, "Copy Trading not found");
 
-	const trader = await getCopyTraderById(copyTrading.masterTraderId.toString());
+	const trader = await getCopyTraderById(
+		copyTrading.masterTraderId._id.toString(),
+	);
 	if (!trader)
 		return sendResponse(reply, 404, false, "Master Trader not found");
 
@@ -115,7 +117,9 @@ export const UpdateCopyTradeHandler = async (
 	if (!copyTrading)
 		return sendResponse(reply, 404, false, "Copy Trading not found");
 
-	const trader = await getCopyTraderById(copyTrading.masterTraderId.toString());
+	const trader = await getCopyTraderById(
+		copyTrading.masterTraderId._id.toString(),
+	);
 	if (!trader)
 		return sendResponse(reply, 404, false, "Master Trader not found");
 
