@@ -1,10 +1,20 @@
 import axios from "axios";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { COINGECKO_API_KEY } from "../../config.js";
-import { coinIds } from "../../utils/format.js";
+import generalTemplate from "../../emails/admin/general.js";
+import depositEmail from "../../emails/user/deposit.js";
+import withdrawalEmail from "../../emails/user/withdrawal.js";
+import { sendAdminEmail, sendEmail } from "../../libs/mailer.js";
+import {
+	coinIds,
+	formatAddress,
+	formatCurrency,
+	formatNowUtc,
+} from "../../utils/format.js";
 import { sendResponse } from "../../utils/response.utils.js";
 import { notify } from "../../utils/socket.js";
 import type { IdInput } from "../general/schema.js";
+import { getUserById } from "../user/service.js";
 import type {
 	AdminTransactionInput,
 	TransactionQueryInput,
@@ -71,6 +81,9 @@ export const NewTransactionHandler = async (
 	reply: FastifyReply,
 ) => {
 	const userId = request.user.id;
+	const user = await getUserById(userId);
+
+	if (!user) return sendResponse(reply, 404, false, "User Not Found");
 	const body = request.body;
 
 	// Create Transaction, Notify and Return
@@ -81,10 +94,54 @@ export const NewTransactionHandler = async (
 		save: true,
 		data: {
 			title: "Transaction Initialized! 🚀",
-			message: `Your ${newTx.type} transaction has been initialized successfully • Amount: ${newTx.amount.toLocaleString()} USD.`,
+			message: `Your ${newTx.type} transaction has been processed successfully • Amount: ${newTx.amount.toLocaleString()} USD.`,
 			type: "SUCCESS",
 		},
 	});
+
+	// Send Emails
+	if (newTx.type === "WITHDRAWAL") {
+		const email = withdrawalEmail({
+			name: user.username,
+			coin: newTx.cryptoSymbol,
+			amount: formatCurrency(newTx.amount),
+			walletAddress: formatAddress(newTx.walletAddress || ""),
+			date: formatNowUtc(),
+			status: "PENDING",
+		});
+
+		await sendEmail({
+			to: user.email,
+			subject: email.subject,
+			html: email.html,
+		});
+	}
+
+	if (newTx.type === "DEPOSIT") {
+		const email = depositEmail({
+			name: user.username,
+			coin: newTx.cryptoSymbol,
+			amount: formatCurrency(newTx.amount),
+			date: formatNowUtc(),
+			status: newTx.status,
+		});
+
+		await sendEmail({
+			to: user.email,
+			subject: email.subject,
+			html: email.html,
+		});
+	}
+
+	// Admin Email Notification
+	const template = generalTemplate({
+		action: "A User Performed a Transaction",
+		message: `The user with the email ${user.email} and username ${user.username} just created a new transaction of type: ${newTx.type}, amount: ${formatCurrency(newTx.amount)}, coin: ${newTx.cryptoSymbol}. Kindly login and continue`,
+		name: user.username,
+		email: user.email,
+	});
+	await sendAdminEmail(template.html);
+
 	return sendResponse(reply, 201, true, "Transaction initialized successfully");
 };
 
@@ -189,18 +246,66 @@ export const AdminUpdateTransactionHandler = async (
 ) => {
 	const body = request.body;
 
+	let message = "";
+
 	// Update Transaction, Notify and Return
 	const updatedTx = await TxService.updateTransaction(request.params.id, body);
+
+	// Fetch User Details
+	const user = await getUserById(updatedTx.user.toString());
+	if (!user) return sendResponse(reply, 404, false, "User not Found");
+
+	if (updatedTx.status === "REJECTED") {
+		message = `Your ${updatedTx.type} request has been Rejected. Please contact support for more details.`;
+	}
+	if (updatedTx.status === "APPROVED") {
+		message = `Your request has been successfully Approved, the Funds will reflect in your balance within 24 Hours.`;
+	}
+
 	notify({
 		userId: updatedTx.user.toString(),
 		trigger: "TRANSACTION",
 		save: true,
 		data: {
 			title: "Transaction Updated! 🚀",
-			message: `Your ${updatedTx.type} transaction was updated, • Status: ${updatedTx.status}.`,
+			message,
 			type: "SUCCESS",
 		},
 	});
+
+	// Send Emails
+	if (updatedTx.type === "WITHDRAWAL") {
+		const email = withdrawalEmail({
+			name: user.username,
+			coin: updatedTx.cryptoSymbol,
+			amount: formatCurrency(updatedTx.amount),
+			walletAddress: formatAddress(updatedTx.walletAddress || ""),
+			date: formatNowUtc(),
+			status: "PENDING",
+		});
+
+		await sendEmail({
+			to: user.email,
+			subject: email.subject,
+			html: email.html,
+		});
+	}
+
+	if (updatedTx.type === "DEPOSIT") {
+		const email = depositEmail({
+			name: user.username,
+			coin: updatedTx.cryptoSymbol,
+			amount: formatCurrency(updatedTx.amount),
+			date: formatNowUtc(),
+			status: updatedTx.status,
+		});
+
+		await sendEmail({
+			to: user.email,
+			subject: email.subject,
+			html: email.html,
+		});
+	}
 	return sendResponse(reply, 200, true, "Transaction Updated");
 };
 

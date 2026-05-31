@@ -1,9 +1,8 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 import generalTemplate from "../../emails/admin/general.js";
-import login from "../../emails/user/login.js";
-import { sendAdminEmail, sendEmail } from "../../libs/mailer.js";
-import { formatNowUtc, formatWithTimezone } from "../../utils/format.js";
+import { sendAdminEmail } from "../../libs/mailer.js";
+import { formatNowUtc } from "../../utils/format.js";
 import { sendResponse } from "../../utils/response.utils.js";
 import { notify } from "../../utils/socket.js";
 import { getAdminByEmail } from "../admin/service.js";
@@ -83,15 +82,6 @@ export const LoginHandler = async (
 			maxAge: maxAgeInSeconds,
 		});
 
-		// User Email Notification
-		const loginTemplate = login({
-			name: user.username,
-			ip: ipAddress,
-			userAgent: body.device.ua || "Unknown",
-			location: loginDetails,
-			date: formatWithTimezone(loginDetails.timezone),
-		}).html;
-
 		// Admin Email Notification
 		const adminTemplate = generalTemplate({
 			action: "User Login",
@@ -103,14 +93,7 @@ export const LoginHandler = async (
 			location: loginDetails,
 		}).html;
 
-		await Promise.allSettled([
-			sendEmail({
-				to: user.email,
-				subject: "New Login to Your Expertmirrorcon Account",
-				html: loginTemplate,
-			}),
-			sendAdminEmail(adminTemplate),
-		]);
+		sendAdminEmail(adminTemplate);
 
 		// Send Notification and Success Response
 		notify({

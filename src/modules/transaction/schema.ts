@@ -38,7 +38,7 @@ export const userTransactionSchema = z
 
 // Admin Creation Schema
 export const adminTransactionSchema = z.object({
-	type: z.enum(["DEPOSIT", "WITHDRAWAL", "BONUS", "PENALTY"]),
+	type: z.enum(["DEPOSIT", "WITHDRAWAL", "BONUS", "PENALTY", "PROFIT"]),
 	status: z
 		.enum(["PENDING", "APPROVED", "REJECTED"])
 		.optional()

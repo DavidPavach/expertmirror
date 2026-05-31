@@ -65,6 +65,7 @@ export function formatNowUtc(): string {
 	return `${monthName} ${day} ${year}, ${hours}:${minutesPadded}${ampm} UTC`;
 }
 
+// Coin Ghecko API Call
 export const coinIds = [
 	"bitcoin",
 	"ethereum",
@@ -75,3 +76,24 @@ export const coinIds = [
 	"litecoin",
 	"dogecoin",
 ];
+
+// Format Address
+export function formatAddress(str: string) {
+	if (str.length < 8) {
+		return str;
+	}
+	const firstFour = str.substring(0, 4);
+	const lastFour = str.substring(str.length - 4);
+
+	return `${firstFour}...${lastFour}`;
+}
+
+// Format Currency
+export const formatCurrency = (value: number) => {
+	return new Intl.NumberFormat("en-US", {
+		style: "currency",
+		currency: "USD",
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	}).format(value);
+};

@@ -96,7 +96,7 @@ export const StopCopyTraderHandler = async (
 		save: true,
 		data: {
 			title: "Copy Trading Stopped",
-			message: `Your Copy trading subscription to ${trader.name} has been paused.`,
+			message: `Your Copy trading subscription to ${trader.name} has been ended.`,
 			type: "WARNING",
 		},
 	});
