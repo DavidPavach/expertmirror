@@ -140,14 +140,17 @@ export const updateEntry = async (
 ) => {
 	const setUpdate: Record<string, string | number | Date> = {};
 
-	if (updateData.date) {
-		setUpdate["entries.$.date"] = updateData.date;
+	if (updateData.commodity) {
+		setUpdate["entries.$.commodity"] = updateData.commodity;
 	}
-	if (updateData.percentChange !== undefined) {
-		setUpdate["entries.$.percentChange"] = updateData.percentChange;
+	if (updateData.amount !== undefined) {
+		setUpdate["entries.$.amount"] = updateData.amount;
 	}
-	if (updateData.price !== undefined) {
-		setUpdate["entries.$.price"] = updateData.price;
+	if (updateData.result !== undefined) {
+		setUpdate["entries.$.result"] = updateData.result;
+	}
+	if (updateData.type !== undefined) {
+		setUpdate["entries.$.type"] = updateData.type;
 	}
 
 	// Perform the database update

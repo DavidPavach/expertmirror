@@ -47,6 +47,7 @@ export const adminTransactionSchema = z.object({
 	amount: z.number().min(1, "Minimum amount is 1"),
 	hash: z.string().optional(),
 	walletAddress: z.string().optional(),
+	show: z.boolean({ error: "Show is required" }),
 });
 
 // Admin Update Schema

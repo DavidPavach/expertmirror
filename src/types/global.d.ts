@@ -7,16 +7,6 @@ declare type ApiResponse<T = any> = {
 	data?: T;
 };
 
-// IPInfo
-declare type IPInfo = {
-	ip?: string;
-	city?: string;
-	region?: string;
-	country_name?: string;
-	timezone?: string;
-	error?: boolean | string;
-};
-
 // Location Info
 declare type LocationInfo = {
 	city: string;

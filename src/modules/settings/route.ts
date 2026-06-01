@@ -12,7 +12,6 @@ export default async function settingsRoutes(app: FastifyInstance) {
 	appWithZod.get(
 		"/get",
 		{
-			preHandler: [app.authenticate],
 			schema: {
 				security: [{ bearerAuth: [] }],
 				tags: ["Settings"],

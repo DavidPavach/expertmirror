@@ -14,6 +14,7 @@ import {
 import { sendResponse } from "../../utils/response.utils.js";
 import { notify } from "../../utils/socket.js";
 import type { IdInput } from "../general/schema.js";
+import { getReferral, updateReward } from "../referral/service.js";
 import { getUserById } from "../user/service.js";
 import type {
 	AdminTransactionInput,
@@ -94,7 +95,7 @@ export const NewTransactionHandler = async (
 		save: true,
 		data: {
 			title: "Transaction Initialized! 🚀",
-			message: `Your ${newTx.type} transaction has been processed successfully • Amount: ${newTx.amount.toLocaleString()} USD.`,
+			message: `Your ${newTx.type} request has been processed successfully • Amount: ${newTx.amount.toLocaleString()} USD.`,
 			type: "SUCCESS",
 		},
 	});
@@ -155,7 +156,7 @@ export const GetMyTransactionsHandler = async (
 
 	// Initialize the filters object with the userId
 	// biome-ignore lint/suspicious/noExplicitAny: <>
-	const filters: any = { user: userId };
+	const filters: any = { user: userId, show: true };
 
 	if (others === true) {
 		filters.type = { $nin: ["DEPOSIT", "WITHDRAWAL"] };
@@ -206,16 +207,18 @@ export const AdminCreateTransactionHandler = async (
 
 	// Create Transaction, Notify and Return
 	const newTx = await TxService.createAdminTransaction(userId, body);
-	notify({
-		userId: newTx.user.toString(),
-		trigger: "TRANSACTION",
-		save: true,
-		data: {
-			title: "Transaction Created! 🚀",
-			message: `Your ${newTx.type} transaction has been created successfully • Amount: ${newTx.amount.toLocaleString()} USD.`,
-			type: "SUCCESS",
-		},
-	});
+	if (newTx.show) {
+		notify({
+			userId: newTx.user.toString(),
+			trigger: "TRANSACTION",
+			save: true,
+			data: {
+				title: "Transaction Created! 🚀",
+				message: `Your ${newTx.type} transaction has been created successfully • Amount: ${newTx.amount.toLocaleString()} USD.`,
+				type: "SUCCESS",
+			},
+		});
+	}
 	return sendResponse(reply, 201, true, "Admin transaction created");
 };
 
@@ -245,7 +248,6 @@ export const AdminUpdateTransactionHandler = async (
 	reply: FastifyReply,
 ) => {
 	const body = request.body;
-
 	let message = "";
 
 	// Update Transaction, Notify and Return
@@ -255,11 +257,33 @@ export const AdminUpdateTransactionHandler = async (
 	const user = await getUserById(updatedTx.user.toString());
 	if (!user) return sendResponse(reply, 404, false, "User not Found");
 
+	// Check if User was Referred
+	const referral = await getReferral(updatedTx.user.toString());
+	if (
+		referral &&
+		referral.rewardAmount === 0 &&
+		updatedTx.status === "APPROVED"
+	) {
+		const newReward = updatedTx.amount * 0.05;
+		await updateReward(user._id.toString(), newReward);
+
+		notify({
+			userId: referral.referrerId.toString(),
+			trigger: "REFERRAL",
+			save: true,
+			data: {
+				title: "Referral Reward! 🚀",
+				message: `A transaction made by your referral ${user.username.toUpperCase()} was approved. You earned a reward of ${formatCurrency(newReward)} USD!`,
+				type: "SUCCESS",
+			},
+		});
+	}
+
 	if (updatedTx.status === "REJECTED") {
-		message = `Your ${updatedTx.type} request has been Rejected. Please contact support for more details.`;
+		message = `Your ${updatedTx.type} request has been Rejected. Please contact support for more details. • Amount: ${updatedTx.amount.toLocaleString()} USD.`;
 	}
 	if (updatedTx.status === "APPROVED") {
-		message = `Your request has been successfully Approved, the Funds will reflect in your balance within 24 Hours.`;
+		message = `Your request has been successfully Approved, the Funds will reflect in your balance within 24 Hours. • Amount: ${updatedTx.amount.toLocaleString()} USD.`;
 	}
 
 	notify({

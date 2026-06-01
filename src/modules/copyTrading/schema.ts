@@ -6,11 +6,12 @@ export const startCopyingSchema = z.object({
 });
 
 export const entrySchema = z.object({
-	date: z.coerce.date({
-		error: "Date is required, kindly enter a valid gate.",
+	commodity: z.string({
+		error: "Commodity is required",
 	}),
-	percentChange: z.number({ error: "Percent Change is required" }).positive(),
-	price: z.number({ error: "Price is required." }),
+	amount: z.number({ error: "Amount is required" }).positive(),
+	type: z.enum(["BUY", "SELL"]),
+	result: z.enum(["LOSS", "PROFIT"]),
 });
 
 export const updateCopyStatsSchema = z.object({

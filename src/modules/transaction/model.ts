@@ -8,6 +8,7 @@ export interface TransactionDoc extends Document {
 	cryptoSymbol: string;
 	walletAddress?: string;
 	hash?: string;
+	show: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -28,6 +29,7 @@ const TransactionSchema = new Schema<TransactionDoc>(
 		amount: { type: Number, required: true },
 		cryptoSymbol: { type: String, required: true },
 		hash: { type: String },
+		show: { type: Boolean, default: true },
 		walletAddress: { type: String },
 	},
 	{ timestamps: true },

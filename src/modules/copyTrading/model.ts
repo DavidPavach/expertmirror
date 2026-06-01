@@ -1,9 +1,10 @@
 import mongoose, { type Document, Schema } from "mongoose";
 
 export interface Entry {
-	date: Date;
-	percentChange: number;
-	price: number;
+	commodity: string;
+	amount: number;
+	type: "BUY" | "SELL";
+	result: "LOSS" | "PROFIT";
 }
 
 export interface CopyTradingDoc extends Document {
@@ -23,9 +24,18 @@ export interface CopyTradingDoc extends Document {
 
 const EntrySchema = new Schema<Entry>(
 	{
-		date: { type: Date, required: true },
-		percentChange: { type: Number, required: true },
-		price: { type: Number, required: true },
+		commodity: { type: String, required: true },
+		amount: { type: Number, required: true },
+		type: {
+			type: String,
+			enum: ["BUY", "SELL"],
+			default: "SELL",
+		},
+		result: {
+			type: String,
+			enum: ["LOSS", "PROFIT"],
+			default: "LOSS",
+		},
 	},
 	{ _id: true },
 );

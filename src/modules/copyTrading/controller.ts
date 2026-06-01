@@ -126,16 +126,26 @@ export const UpdateCopyTradeHandler = async (
 	// Update, notify and return
 	await CopyInvestmentService.updateCopyTrading(id, body);
 
-	notify({
-		userId: copyTrading.user.toString(),
-		trigger: "COPY_TRADING",
-		save: true,
-		data: {
-			title: "Copy Trading Updated",
-			message: `Your Copy trading subscription to ${trader.name} has been updated.`,
-			type: "INFO",
-		},
-	});
+	if (Array.isArray(body?.entries) && body.entries.length > 0) {
+		const userId = copyTrading.user.toString();
+		const uniqueEntries = Array.from(new Set(body.entries));
+
+		// Prepare notifications
+		const notifications = uniqueEntries.map((entry) => ({
+			userId,
+			trigger: "COPY_TRADING",
+			save: true,
+			data: {
+				title: "Copy Trading Updated",
+				message: `A new copy trading has been executed on your account: • Commodity:${entry.commodity} • Type: ${entry.type} • Amount:${entry.amount} — Result: ${entry.result}`,
+				type: "INFO",
+			},
+		}));
+
+		// send in parallel and wait for all
+		await Promise.all(notifications.map((n) => notify(n)));
+	}
+
 	return sendResponse(reply, 200, true, "Stats updated");
 };
 
