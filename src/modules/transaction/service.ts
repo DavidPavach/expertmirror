@@ -115,6 +115,10 @@ export const getUserDashboardStats = async (userId: string) => {
 					totalTradeProfit: {
 						$sum: { $cond: [{ $eq: ["$status", "WON"] }, "$profit", 0] },
 					},
+					// Sum loss only if the trade is LOST
+					totalTradeLoss: {
+						$sum: { $cond: [{ $eq: ["$status", "LOST"] }, "$profit", 0] },
+					},
 					// Sum the initial amount as locked funds if the trade is OPEN
 					lockedTradeAmount: {
 						$sum: { $cond: [{ $eq: ["$status", "OPEN"] }, "$amount", 0] },
@@ -164,6 +168,7 @@ export const getUserDashboardStats = async (userId: string) => {
 
 	const tradeData = tradeStats[0] || {
 		totalTradeProfit: 0,
+		totalTradeLoss: 0,
 		lockedTradeAmount: 0,
 	};
 	const copyData = copyStats[0] || {
@@ -189,11 +194,15 @@ export const getUserDashboardStats = async (userId: string) => {
 		txData.approvedDeposits +
 		txData.approvedBonuses +
 		totalProfit -
-		(txData.totalWithdrawals + txData.approvedPenalties + totalLockedFunds);
+		(txData.totalWithdrawals +
+			txData.approvedPenalties +
+			totalLockedFunds +
+			tradeData.totalTradeLoss);
 
 	return {
 		...txData,
 		totalTradeProfit: tradeData.totalTradeProfit,
+		totalTradeLoss: tradeData.totalTradeLoss,
 		totalCopyProfit: copyData.totalCopyProfit,
 		totalLockedFunds,
 		totalProfit,

@@ -12,10 +12,7 @@ export const getPaginatedCopies = async (page: number, limit: number) => {
 	const skip = (page === 1 ? 0 : page - 1) * limit;
 
 	const [copies, totalDocuments] = await Promise.all([
-		TraderModel.find()
-			.sort({ winRate: -1, totalFollowers: -1 })
-			.skip(skip)
-			.limit(limit),
+		TraderModel.find().sort({ winRate: -1 }).skip(skip).limit(limit),
 		TraderModel.countDocuments(),
 	]);
 
