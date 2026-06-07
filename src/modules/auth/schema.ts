@@ -11,46 +11,28 @@ export const loginSchema = z.object({
 		.string({ error: "Password is required" })
 		.min(6, { error: "Password must be at least 6 characters long" }),
 
-	device: z.object({
-		ua: z.string().optional(),
-		type: z
-			.enum([
-				"desktop",
-				"mobile",
-				"tablet",
-				"console",
-				"embedded",
-				"smarttv",
-				"wearable",
-				"xr",
-			])
-			.optional(),
-		os: z.string().optional(),
-		browser: z.string().optional(),
-	}),
+	device: z
+		.object({
+			ua: z.string().optional(),
+			type: z.string().optional(),
+			os: z.string().optional(),
+			browser: z.string().optional(),
+		})
+		.optional(),
 
 	rememberMe: z.coerce.boolean().optional().default(false),
 });
 
 // Service Schema
 export const serviceSchema = z.object({
-	device: z.object({
-		ua: z.string().optional(),
-		type: z
-			.enum([
-				"desktop",
-				"mobile",
-				"tablet",
-				"console",
-				"embedded",
-				"smarttv",
-				"wearable",
-				"xr",
-			])
-			.optional(),
-		os: z.string().optional(),
-		browser: z.string().optional(),
-	}),
+	device: z
+		.object({
+			ua: z.string().optional(),
+			type: z.string().optional(),
+			os: z.string().optional(),
+			browser: z.string().optional(),
+		})
+		.optional(),
 
 	rememberMe: z.coerce.boolean().optional().default(false),
 });

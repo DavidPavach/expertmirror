@@ -95,6 +95,8 @@ export const LoginHandler = async (
 
 		sendAdminEmail(adminTemplate);
 
+		const message = `New login detected from IP: ${ipAddress} • Device: ${body.device?.type} • Browser: ${body.device?.browser} • OS:${body.device?.os} • User agent: ${body.device?.ua} • Time: ${formatNowUtc()}`;
+
 		// Send Notification and Success Response
 		notify({
 			userId: user._id.toString(),
@@ -102,7 +104,7 @@ export const LoginHandler = async (
 			save: true,
 			data: {
 				title: "New Login",
-				message: `New login detected from IP: ${ipAddress} • Device: ${body.device.type} • Browser: ${body.device.browser} • OS:${body.device.os} • User agent: ${body.device.ua} • Time: ${formatNowUtc()}`,
+				message,
 				type: "INFO",
 			},
 		});

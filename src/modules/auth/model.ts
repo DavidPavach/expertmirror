@@ -32,21 +32,10 @@ const authSchema = new Schema<AuthDoc>(
 		ip: { type: String },
 		device: {
 			ua: { type: String },
-			type: {
-				type: String,
-				enum: [
-					"desktop",
-					"mobile",
-					"tablet",
-					"console",
-					"embedded",
-					"smarttv",
-					"wearable",
-					"xr",
-				],
-			},
+			type: { type: String },
 			os: { type: String },
 			browser: { type: String },
+			default: {},
 		},
 		expiresAt: { type: Date, required: true, expires: 0 },
 	},
