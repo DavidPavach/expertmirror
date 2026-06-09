@@ -78,8 +78,9 @@ export const LoginHandler = async (
 			path: "/",
 			httpOnly: true,
 			secure: true,
-			sameSite: "none",
+			sameSite: "lax",
 			maxAge: maxAgeInSeconds,
+			domain: ".expertmirrorcon.com",
 		});
 
 		// Admin Email Notification
